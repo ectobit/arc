@@ -1,0 +1,57 @@
+version: '3.9'
+services:
+  postgres:
+    container_name: arc-postgres
+    image: postgres:14-alpine
+    restart: always
+    volumes:
+      - .docker:/docker-entrypoint-initdb.d
+      - arc:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=arc
+      - POSTGRES_DB=arc
+    ports:
+      - 5432:5432
+  migrate:
+    image: migrate/migrate
+    container_name: arc-migrate
+    depends_on:
+      - postgres
+    volumes:
+      - ./migrations:/migrations
+    command:
+      - -path=/migrations/
+      - -database=postgres://postgres:arc@postgres/arc?sslmode=disable&query
+      - up
+  adminer:
+    image: adminer
+    container_name: arc-adminer
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    ports:
+      - 8080:8080
+  arc:
+    image: acim/go-reflex
+    container_name: arc-app
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - RACE_DETECTOR=1
+      - ARC_JWT_SECRET
+      - ARC_SMTP_HOST
+      - ARC_SMTP_PORT
+      - ARC_SMTP_USERNAME
+      - ARC_SMTP_PASSWORD
+      - ARC_SMTP_SENDER
+    volumes:
+      - ./:/app
+    ports:
+      - 3000:3000
+    stdin_open: true
+    tty: true
+volumes:
+  arc:
