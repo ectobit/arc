@@ -67,7 +67,7 @@ func main() { //nolint:funlen
 	mux.Use(mw.ZapLogger(log))
 	mux.Use(middleware.Recoverer)
 
-	conn, err := postgres.Connect(context.TODO(), cfg.DSN, log)
+	pool, err := postgres.Connect(context.TODO(), cfg.DSN, log)
 	if err != nil {
 		exit("postgres", err)
 	}
@@ -78,7 +78,7 @@ func main() { //nolint:funlen
 	}
 
 	render := render.NewJSON(log)
-	usersRepository := postgres.NewUserRepository(conn, log)
+	usersRepository := postgres.NewUserRepository(pool, log)
 	mailer := smtp.NewMailer(cfg.SMTP.Host, uint16(cfg.SMTP.Port), cfg.SMTP.Username, cfg.SMTP.Password,
 		cfg.SMTP.Sender, log)
 	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExtBaseURL, log)
@@ -111,7 +111,9 @@ func main() { //nolint:funlen
 		exit("server shutdown", err)
 	}
 
-	conn.Close()
+	pool.Close()
+
+	_ = log.Sync()
 }
 
 func mustCreateLogger(logFormat, logLevel string) *zap.Logger {
