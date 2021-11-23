@@ -34,7 +34,8 @@ func TestRegister(t *testing.T) {
 
 	render := render.NewJSON(log)
 
-	conn, err := postgres.Connect(ctx, fmt.Sprintf("postgres://postgres:arc@%s/test?sslmode=disable", databaseName), log)
+	conn, err := postgres.Connect(ctx, fmt.Sprintf("postgres://postgres:arc@%s/test?sslmode=disable", databaseName),
+		log, "debug")
 	if err != nil {
 		t.Error(err)
 	}

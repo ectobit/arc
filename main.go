@@ -67,7 +67,7 @@ func main() { //nolint:funlen
 	mux.Use(mw.ZapLogger(log))
 	mux.Use(middleware.Recoverer)
 
-	pool, err := postgres.Connect(context.TODO(), cfg.DSN, log)
+	pool, err := postgres.Connect(context.TODO(), cfg.DSN, log, cfg.Log.Level)
 	if err != nil {
 		exit("postgres", err)
 	}
