@@ -1,0 +1,48 @@
+definitions:
+  public.User:
+    properties:
+      authToken:
+        type: string
+      created:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      refreshToken:
+        type: string
+      updated:
+        type: string
+    type: object
+  public.UserRegistration:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /users:
+    post:
+      consumes:
+      - application/vnd.api+json
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/public.UserRegistration'
+      produces:
+      - application/vnd.api+json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/public.User'
+      summary: Register user
+      tags:
+      - users
+swagger: "2.0"

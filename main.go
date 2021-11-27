@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/ectobit/arc/docs"
 	"github.com/ectobit/arc/handler"
 	"github.com/ectobit/arc/handler/render"
 	"github.com/ectobit/arc/handler/token"
@@ -18,6 +19,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"go.ectobit.com/act"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -83,6 +85,9 @@ func main() { //nolint:funlen
 		cfg.SMTP.Sender, log)
 	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExtBaseURL, log)
 
+	mux.Get("/", httpSwagger.Handler(
+		httpSwagger.URL(fmt.Sprintf("%s/doc.json", cfg.ExtBaseURL)),
+	))
 	mux.Post("/users", usersHandler.Register)
 	mux.Post("/users/login", usersHandler.Login)
 	mux.Get("/users/activate/{token}", usersHandler.Activate)

@@ -18,6 +18,7 @@ REST API in Go providing user registration, account activation, login, password 
 - [x] Password strength check
 - [x] JWT based authentication
 - [ ] Good test coverage (just 9% at the moment)
+- [ ] Swagger specification
 - [ ] Authorization
 - [ ] Send messages to message queue
 - [ ] SSE from message queue

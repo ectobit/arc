@@ -39,6 +39,15 @@ func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sen
 }
 
 // Register registers new users.
+//
+// @Summary Register user
+// @Description
+// @Tags users
+// @Accept json-api
+// @Produce json-api
+// @Router /users [post]
+// @Param user body public.UserRegistration true "User"
+// @Success 201 {object} public.User.
 func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	user, publicErr := public.UserRegistrationFromJSON(req.Body, h.log)
 	if publicErr != nil {
