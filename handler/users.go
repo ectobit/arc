@@ -125,7 +125,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !user.IsPasswordValid(login.Password) {
+	if !user.IsValidPassword(login.Password) {
 		h.r.Render(res, http.StatusUnauthorized, nil)
 
 		return

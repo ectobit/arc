@@ -24,8 +24,8 @@ func (u *User) IsActive() bool {
 	return *u.Active
 }
 
-// IsPasswordValid checks if provided plain password matched hashed password.
-func (u *User) IsPasswordValid(plainPassword string) bool {
+// IsValidPassword checks if provided plain password matched hashed password.
+func (u *User) IsValidPassword(plainPassword string) bool {
 	if plainPassword == "" {
 		return false
 	}
