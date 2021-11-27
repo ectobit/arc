@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ectobit/arc/handler"
-	"github.com/ectobit/arc/handler/render"
-	"github.com/ectobit/arc/handler/token"
-	"github.com/ectobit/arc/repository/postgres"
+	"go.ectobit.com/arc/handler"
+	"go.ectobit.com/arc/handler/render"
+	"go.ectobit.com/arc/handler/token"
+	"go.ectobit.com/arc/repository/postgres"
 	"go.uber.org/zap/zaptest"
 )
 

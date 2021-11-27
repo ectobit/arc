@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/ectobit/arc/domain"
 	"github.com/nbutton23/zxcvbn-go"
+	"go.ectobit.com/arc/domain"
 	"go.uber.org/zap"
 )
 

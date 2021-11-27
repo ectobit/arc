@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ectobit/arc/domain"
+	"go.ectobit.com/arc/domain"
 )
 
 // Errors.

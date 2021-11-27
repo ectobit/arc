@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/smtp"
 
-	"github.com/ectobit/arc/send"
+	"go.ectobit.com/arc/send"
 	"go.uber.org/zap"
 )
 

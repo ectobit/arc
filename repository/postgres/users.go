@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ectobit/arc/domain"
-	"github.com/ectobit/arc/repository"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"go.ectobit.com/arc/domain"
+	"go.ectobit.com/arc/repository"
 	"go.uber.org/zap"
 )
 

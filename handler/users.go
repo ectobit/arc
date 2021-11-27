@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ectobit/arc/handler/public"
-	"github.com/ectobit/arc/handler/render"
-	"github.com/ectobit/arc/handler/token"
-	"github.com/ectobit/arc/repository"
-	"github.com/ectobit/arc/send"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.ectobit.com/arc/handler/public"
+	"go.ectobit.com/arc/handler/render"
+	"go.ectobit.com/arc/handler/token"
+	"go.ectobit.com/arc/repository"
+	"go.ectobit.com/arc/send"
 	"go.uber.org/zap"
 )
 

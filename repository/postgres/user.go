@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ectobit/arc/domain"
 	"github.com/jackc/pgtype"
+	"go.ectobit.com/arc/domain"
 )
 
 // User entity.
