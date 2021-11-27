@@ -10,7 +10,6 @@ import (
 	"github.com/ectobit/arc/domain"
 	"github.com/nbutton23/zxcvbn-go"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const minPasswordStrength = 3
@@ -67,7 +66,7 @@ func UserRegistrationFromJSON(body io.Reader, log *zap.Logger) (*UserRegistratio
 		return nil, NewBadRequestError("weak password")
 	}
 
-	u.HashedPassword, err = hashPassword(u.Password)
+	u.HashedPassword, err = domain.HashPassword(u.Password)
 	if err != nil {
 		u.log.Warn("hash password", zap.Error(err))
 
@@ -96,13 +95,4 @@ func UserLoginFromJSON(body io.Reader) (*UserLogin, error) {
 
 func isWeakPassword(plainPassword string) bool {
 	return zxcvbn.PasswordStrength(plainPassword, nil).Score < minPasswordStrength
-}
-
-func hashPassword(plainPassword string) ([]byte, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, fmt.Errorf("bcrypt: %w", err)
-	}
-
-	return hash, nil
 }

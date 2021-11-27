@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -30,4 +31,14 @@ func (u *User) IsPasswordValid(plainPassword string) bool {
 	}
 
 	return bcrypt.CompareHashAndPassword(u.Password, []byte(plainPassword)) == nil
+}
+
+// HashPassword hashes provided plain password using bcrypt hasher.
+func HashPassword(plainPassword string) ([]byte, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("bcrypt: %w", err)
+	}
+
+	return hash, nil
 }
