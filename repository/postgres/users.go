@@ -24,10 +24,10 @@ func NewUserRepository(conn *pgxpool.Pool, log *zap.Logger) *UsersRepository {
 }
 
 // Create creates new user in postgres repository.
-func (repo *UsersRepository) Create(ctx context.Context, domainUser *domain.User) (*domain.User, error) {
+func (repo *UsersRepository) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
 	query := `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, created, activation_token, active`
 
-	row := repo.pool.QueryRow(ctx, query, domainUser.Email, domainUser.Password.String())
+	row := repo.pool.QueryRow(ctx, query, email, password)
 
 	user := &User{} //nolint:exhaustivestruct
 
@@ -36,7 +36,7 @@ func (repo *UsersRepository) Create(ctx context.Context, domainUser *domain.User
 		return nil, fmt.Errorf("create user: %w", toRepositoryError(err))
 	}
 
-	domainUser, err = user.DomainUser()
+	domainUser, err := user.DomainUser()
 	if err != nil {
 		return nil, fmt.Errorf("convert to domain user: %w", err)
 	}

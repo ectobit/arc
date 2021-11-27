@@ -10,6 +10,7 @@ import (
 	"github.com/ectobit/arc/domain"
 	"github.com/nbutton23/zxcvbn-go"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const minPasswordStrength = 3
@@ -27,8 +28,8 @@ type User struct {
 // FromDomainUser converts domain user to public user.
 func FromDomainUser(user *domain.User) *User {
 	return &User{ //nolint:exhaustivestruct
-		ID:      *user.ID,
-		Email:   *user.Email,
+		ID:      user.ID,
+		Email:   user.Email,
 		Created: user.Created,
 		Updated: user.Updated,
 	}
@@ -36,14 +37,17 @@ func FromDomainUser(user *domain.User) *User {
 
 // UserRegistration contains data to receive.
 type UserRegistration struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	log      *zap.Logger
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	HashedPassword []byte `json:"-"`
+	log            *zap.Logger
 }
 
 // UserRegistrationFromJSON parses user registration data from request body.
 func UserRegistrationFromJSON(body io.Reader, log *zap.Logger) (*UserRegistration, *Error) {
 	var u UserRegistration
+
+	var err error
 
 	if err := json.NewDecoder(body).Decode(&u); err != nil {
 		log.Warn("decode json: %w", zap.Error(err))
@@ -51,34 +55,26 @@ func UserRegistrationFromJSON(body io.Reader, log *zap.Logger) (*UserRegistratio
 		return nil, NewBadRequestError("invalid json body")
 	}
 
-	return &u, nil
-}
-
-// DomainUser converts user registration to domain user.
-func (ur *UserRegistration) DomainUser() (*domain.User, *Error) {
-	if ur.Email == "" {
+	if u.Email == "" {
 		return nil, NewBadRequestError("empty email")
 	}
 
-	if ur.Password == "" {
+	if u.Password == "" {
 		return nil, NewBadRequestError("empty password")
 	}
 
-	if isWeakPassword(ur.Password) {
+	if isWeakPassword(u.Password) {
 		return nil, NewBadRequestError("weak password")
 	}
 
-	hashedPassword, err := domain.PasswordFromPlain(ur.Password)
+	u.HashedPassword, err = hashPassword(u.Password)
 	if err != nil {
-		ur.log.Warn("password from plain", zap.Error(err))
+		u.log.Warn("hash password", zap.Error(err))
 
 		return nil, ErrorFromStatusCode(http.StatusInternalServerError)
 	}
 
-	return &domain.User{ //nolint:exhaustivestruct
-		Email:    &ur.Email,
-		Password: hashedPassword,
-	}, nil
+	return &u, nil
 }
 
 // UserLogin contains user login data to receive.
@@ -100,4 +96,13 @@ func UserLoginFromJSON(body io.Reader) (*UserLogin, error) {
 
 func isWeakPassword(plainPassword string) bool {
 	return zxcvbn.PasswordStrength(plainPassword, nil).Score < minPasswordStrength
+}
+
+func hashPassword(plainPassword string) ([]byte, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("bcrypt: %w", err)
+	}
+
+	return hash, nil
 }

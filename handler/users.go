@@ -47,14 +47,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	domainUser, publicErr := user.DomainUser()
-	if publicErr != nil {
-		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
-
-		return
-	}
-
-	domainUser, err := h.usersRepo.Create(req.Context(), domainUser)
+	domainUser, err := h.usersRepo.Create(req.Context(), user.Email, user.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrDuplicateKey) {
 			h.r.Error(res, http.StatusBadRequest, "already registered")
@@ -68,9 +61,9 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	message := fmt.Sprintf("%s/users/activate/%s", h.baseURL, *domainUser.ActivationToken)
+	message := fmt.Sprintf("%s/users/activate/%s", h.baseURL, domainUser.ActivationToken)
 
-	if err = h.sender.Send(*domainUser.Email, "Account activation", message); err != nil {
+	if err = h.sender.Send(domainUser.Email, "Account activation", message); err != nil {
 		h.log.Warn("send activation link", zap.Error(err))
 
 		h.r.Render(res, http.StatusInternalServerError, nil)
@@ -132,7 +125,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !user.Password.IsValid(login.Password) {
+	if !user.IsPasswordValid(login.Password) {
 		h.r.Render(res, http.StatusUnauthorized, nil)
 
 		return
