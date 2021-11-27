@@ -25,13 +25,14 @@ func NewUserRepository(conn *pgxpool.Pool, log *zap.Logger) *UsersRepository {
 
 // Create creates new user in postgres repository.
 func (repo *UsersRepository) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
-	query := `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, created, activation_token, active`
+	query := `INSERT INTO users (email, password) VALUES ($1, $2)
+		RETURNING id, email, password, created, activation_token, active`
 
 	row := repo.pool.QueryRow(ctx, query, email, password)
 
 	user := &User{} //nolint:exhaustivestruct
 
-	err := row.Scan(&user.ID, &user.Created, &user.ActivationToken, &user.Active)
+	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.ActivationToken, &user.Active)
 	if err != nil {
 		return nil, fmt.Errorf("create user: %w", toRepositoryError(err))
 	}
