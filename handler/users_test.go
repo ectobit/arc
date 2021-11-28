@@ -27,8 +27,8 @@ func TestRegister(t *testing.T) {
 		t.Skip()
 	}
 
-	serverURL := setup(t)
-
+	usersHandler := setup(t)
+	server := httptest.NewServer(http.HandlerFunc(usersHandler.Register))
 	tests := map[string]struct {
 		in         string
 		wantStatus int
@@ -54,7 +54,7 @@ func TestRegister(t *testing.T) {
 
 			buf := bytes.NewBufferString(test.in)
 
-			gotRes, gotErr := http.DefaultClient.Post(serverURL, "application/json", buf) //nolint:noctx
+			gotRes, gotErr := http.DefaultClient.Post(server.URL, "application/json", buf) //nolint:noctx
 			if gotErr != nil {
 				t.Error(gotErr)
 			}
@@ -82,7 +82,7 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func setup(t *testing.T) string {
+func setup(t *testing.T) *handler.UsersHandler {
 	t.Helper()
 
 	databaseName := os.Getenv("ARC_DB_HOST")
@@ -115,9 +115,5 @@ func setup(t *testing.T) string {
 		t.Error(err)
 	}
 
-	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, &send.Fake{}, "", log)
-
-	server := httptest.NewServer(http.HandlerFunc(usersHandler.Register))
-
-	return server.URL
+	return handler.NewUsersHandler(render, usersRepository, jwt, &send.Fake{}, "", log)
 }
