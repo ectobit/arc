@@ -26,6 +26,9 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// Version of the application to be defined dynamically by linker flags.
+var Version = time.Now().Local().Format("20060102150405") //nolint:gochecknoglobals
+
 type config struct {
 	Port            uint          `def:"3000"`
 	ShutdownTimeout time.Duration `def:"30s"`
@@ -68,7 +71,7 @@ func main() { //nolint:funlen
 	}
 
 	u := mustParseURL(cfg.ExtBaseURL)
-	docs.SwaggerInfo.Version = "0.1"
+	docs.SwaggerInfo.Version = Version
 	docs.SwaggerInfo.Host = u.Host
 	docs.SwaggerInfo.BasePath = u.Path
 	docs.SwaggerInfo.Schemes = []string{u.Scheme}
