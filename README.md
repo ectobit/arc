@@ -5,7 +5,7 @@
 [![Go Report](https://goreportcard.com/badge/go.ectobit.com/arc)](https://goreportcard.com/report/go.ectobit.com/arc)
 [![License](https://img.shields.io/badge/license-BSD--2--Clause--Patent-orange.svg)](https://github.com/ectobit/arc/blob/main/LICENSE)
 
-REST API in Go providing user registration, account activation, login, password reset and JWT based authentication.
+REST API in Go user accounting and authentication.
 
 ## Features
 
@@ -18,10 +18,22 @@ REST API in Go providing user registration, account activation, login, password 
 - [x] Password strength check
 - [x] JWT based authentication
 - [ ] Good test coverage (just 9% at the moment)
-- [ ] Swagger specification
+- [x] Swagger specification
 - [ ] Authorization
 - [ ] Send messages to message queue
 - [ ] SSE from message queue
+
+## Contribution
+
+- `make gen-swagger` regenerates swagger specification
+- `make lint` lints the project
+- `make start` starts docker-compose stack
+- `make stop` stops docker-compose stack
+- `make test` runs unit tests
+- `make test-all` runs integration tests (requires docker-stack to be up)
+- `make test-cov` displays test coverage
+
+## [Swagger specification](http://localhost:3000/)
 
 ## Links related to future tasks
 

@@ -40,14 +40,16 @@ func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sen
 
 // Register registers new users.
 //
-// @Summary Register user
-// @Description
+// @Summary Register user account
 // @Tags users
-// @Accept json-api
-// @Produce json-api
+// @Accept json
+// @Produce json
 // @Router /users [post]
 // @Param user body public.UserRegistration true "User"
-// @Success 201 {object} public.User.
+// @Success 201 {object} public.User
+// @Failure 400 {object} render.Error
+// @Failure 409 {object} render.Error
+// @Failure 500
 func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	user, publicErr := public.UserRegistrationFromJSON(req.Body, h.log)
 	if publicErr != nil {
@@ -59,7 +61,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	domainUser, err := h.usersRepo.Create(req.Context(), user.Email, user.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrDuplicateKey) {
-			h.r.Error(res, http.StatusBadRequest, "already registered")
+			h.r.Error(res, http.StatusConflict, "already registered")
 
 			return
 		}
@@ -87,6 +89,16 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 }
 
 // Activate activates user account.
+//
+// @Summary Activate user account
+// @Tags users
+// @Accept json
+// @Produce json
+// @Router /users/activate/{token} [get]
+// @Param token path string true "Activation token"
+// @Success 200 {object} public.User
+// @Failure 400 {object} render.Error
+// @Failure 500
 func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 	token := chi.URLParam(req, "token")
 	if token == "" {
@@ -116,6 +128,17 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 }
 
 // Login logins user.
+//
+// @Summary Register user account
+// @Tags users
+// @Accept json
+// @Produce json
+// @Router /users/login [post]
+// @Param user body public.UserLogin true "User"
+// @Success 201 {object} public.User
+// @Failure 400 {object} render.Error
+// @Failure 401 {object} render.Error
+// @Failure 500
 func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 	login, err := public.UserLoginFromJSON(req.Body)
 	if err != nil {
@@ -157,5 +180,5 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	h.r.Render(res, http.StatusCreated, publicUser)
+	h.r.Render(res, http.StatusOK, publicUser)
 }

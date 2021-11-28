@@ -83,7 +83,7 @@ type ZapAdapter struct {
 }
 
 // NewZapAdapter creates Logger adapter for zap logger.
-func NewZapAdapter(l *zap.Logger) Logger { //nolint:ireturn
+func NewZapAdapter(l *zap.Logger) Logger {
 	return &ZapAdapter{l: l}
 }
 

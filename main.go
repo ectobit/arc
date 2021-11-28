@@ -14,7 +14,9 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.ectobit.com/act"
-	_ "go.ectobit.com/arc/docs"
+	"go.ectobit.com/arc/docs"
+
+	// _ "go.ectobit.com/arc/docs"
 	"go.ectobit.com/arc/handler"
 	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
@@ -49,6 +51,11 @@ type config struct {
 	}
 }
 
+// @title Arc
+// @description REST API providing user accounting and authentication
+
+// @license.name BSD-2-Clause-Patent
+// @license.url https://github.com/ectobit/arc/blob/main/LICENSE
 func main() { //nolint:funlen
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
@@ -60,6 +67,11 @@ func main() { //nolint:funlen
 	if err := cli.Parse(cfg, os.Args[1:]); err != nil {
 		exit("parsing flags", err)
 	}
+
+	docs.SwaggerInfo.Version = "0.1"
+	docs.SwaggerInfo.Host = cfg.ExtBaseURL
+	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Schemes = []string{"http"}
 
 	log := mustCreateLogger(cfg.Log.Format, cfg.Log.Level)
 
@@ -85,7 +97,7 @@ func main() { //nolint:funlen
 		cfg.SMTP.Sender, log)
 	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExtBaseURL, log)
 
-	mux.Get("/", httpSwagger.Handler(
+	mux.Get("/*", httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("%s/doc.json", cfg.ExtBaseURL)),
 	))
 	mux.Post("/users", usersHandler.Register)

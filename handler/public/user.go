@@ -19,7 +19,7 @@ var emailRegex = regexp.MustCompile("^(?:(?:(?:(?:[a-zA-Z]|\\d|[!#\\$%&'\\*\\+\\
 
 // User contains user data to send out.
 type User struct {
-	ID           string     `json:"id,omitempty"`
+	ID           string     `json:"id,omitempty" format:"uuid"`
 	Email        string     `json:"email"`
 	Created      *time.Time `json:"created"`
 	Updated      *time.Time `json:"updated,omitempty"`

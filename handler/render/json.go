@@ -47,9 +47,10 @@ func (r *JSON) Render(res http.ResponseWriter, statusCode int, body interface{})
 
 // Error renders HTTP response with error in JSON body.
 func (r *JSON) Error(res http.ResponseWriter, statusCode int, message string) {
-	r.Render(res, statusCode, &err{Error: message})
+	r.Render(res, statusCode, &Error{Error: message})
 }
 
-type err struct {
+// Error is used to render JSON error.
+type Error struct {
 	Error string `json:"error"`
 }

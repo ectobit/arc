@@ -1,21 +1,27 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "REST API providing user accounting and authentication",
+        "title": "Arc",
+        "contact": {},
+        "license": {
+            "name": "BSD-2-Clause-Patent",
+            "url": "https://github.com/ectobit/arc/blob/main/LICENSE"
+        }
     },
     "paths": {
         "/users": {
             "post": {
                 "consumes": [
-                    "application/vnd.api+json"
+                    "application/json"
                 ],
                 "produces": [
-                    "application/vnd.api+json"
+                    "application/json"
                 ],
                 "tags": [
                     "users"
                 ],
-                "summary": "Register user",
+                "summary": "Register user account",
                 "parameters": [
                     {
                         "description": "User",
@@ -33,6 +39,109 @@
                         "schema": {
                             "$ref": "#/definitions/public.User"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/render.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/render.Error"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/users/activate/{token}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Activate user account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activation token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/public.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/render.Error"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Register user account",
+                "parameters": [
+                    {
+                        "description": "User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/public.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/public.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/render.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/render.Error"
+                        }
+                    },
+                    "500": {
+                        "description": ""
                     }
                 }
             }
@@ -52,12 +161,24 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                 },
                 "refreshToken": {
                     "type": "string"
                 },
                 "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "public.UserLogin": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
@@ -69,6 +190,14 @@
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "render.Error": {
+            "type": "object",
+            "properties": {
+                "error": {
                     "type": "string"
                 }
             }

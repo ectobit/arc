@@ -8,10 +8,18 @@ definitions:
       email:
         type: string
       id:
+        format: uuid
         type: string
       refreshToken:
         type: string
       updated:
+        type: string
+    type: object
+  public.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
         type: string
     type: object
   public.UserRegistration:
@@ -21,13 +29,23 @@ definitions:
       password:
         type: string
     type: object
+  render.Error:
+    properties:
+      error:
+        type: string
+    type: object
 info:
   contact: {}
+  description: REST API providing user accounting and authentication
+  license:
+    name: BSD-2-Clause-Patent
+    url: https://github.com/ectobit/arc/blob/main/LICENSE
+  title: Arc
 paths:
   /users:
     post:
       consumes:
-      - application/vnd.api+json
+      - application/json
       parameters:
       - description: User
         in: body
@@ -36,13 +54,80 @@ paths:
         schema:
           $ref: '#/definitions/public.UserRegistration'
       produces:
-      - application/vnd.api+json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/public.User'
-      summary: Register user
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/render.Error'
+        "500":
+          description: ""
+      summary: Register user account
+      tags:
+      - users
+  /users/activate/{token}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Activation token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/public.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.Error'
+        "500":
+          description: ""
+      summary: Activate user account
+      tags:
+      - users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/public.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/public.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/render.Error'
+        "500":
+          description: ""
+      summary: Register user account
       tags:
       - users
 swagger: "2.0"
