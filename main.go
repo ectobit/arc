@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,8 +16,6 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.ectobit.com/act"
 	"go.ectobit.com/arc/docs"
-
-	// _ "go.ectobit.com/arc/docs"
 	"go.ectobit.com/arc/handler"
 	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
@@ -68,10 +67,11 @@ func main() { //nolint:funlen
 		exit("parsing flags", err)
 	}
 
+	u := mustParseURL(cfg.ExtBaseURL)
 	docs.SwaggerInfo.Version = "0.1"
-	docs.SwaggerInfo.Host = cfg.ExtBaseURL
-	docs.SwaggerInfo.BasePath = "/"
-	docs.SwaggerInfo.Schemes = []string{"http"}
+	docs.SwaggerInfo.Host = u.Host
+	docs.SwaggerInfo.BasePath = u.Path
+	docs.SwaggerInfo.Schemes = []string{u.Scheme}
 
 	log := mustCreateLogger(cfg.Log.Format, cfg.Log.Level)
 
@@ -167,6 +167,15 @@ func mustCreateLogger(logFormat, logLevel string) *zap.Logger {
 	}
 
 	return logger
+}
+
+func mustParseURL(baseURL string) *url.URL {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		exit("parse base url", err)
+	}
+
+	return u
 }
 
 func exit(message string, err error) {

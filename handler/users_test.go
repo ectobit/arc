@@ -25,7 +25,7 @@ func TestRegister(t *testing.T) {
 
 	databaseName := os.Getenv("ARC_DB_HOST")
 	if databaseName == "" {
-		t.Error("environment variable ARC_DB_HOST not set")
+		t.Fatal("environment variable ARC_DB_HOST not set")
 	}
 
 	ctx := context.TODO()
@@ -37,7 +37,7 @@ func TestRegister(t *testing.T) {
 	conn, err := postgres.Connect(ctx, fmt.Sprintf("postgres://postgres:arc@%s/test?sslmode=disable", databaseName),
 		log, "debug")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	defer conn.Close()

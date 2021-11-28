@@ -38,7 +38,7 @@ var doc = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Register user account",
+                "summary": "Register user account.",
                 "parameters": [
                     {
                         "description": "User",
@@ -86,7 +86,7 @@ var doc = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Activate user account",
+                "summary": "Activate user account.",
                 "parameters": [
                     {
                         "type": "string",
@@ -126,7 +126,7 @@ var doc = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Register user account",
+                "summary": "Login.",
                 "parameters": [
                     {
                         "description": "User",

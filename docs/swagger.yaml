@@ -70,7 +70,7 @@ paths:
             $ref: '#/definitions/render.Error'
         "500":
           description: ""
-      summary: Register user account
+      summary: Register user account.
       tags:
       - users
   /users/activate/{token}:
@@ -96,7 +96,7 @@ paths:
             $ref: '#/definitions/render.Error'
         "500":
           description: ""
-      summary: Activate user account
+      summary: Activate user account.
       tags:
       - users
   /users/login:
@@ -127,7 +127,7 @@ paths:
             $ref: '#/definitions/render.Error'
         "500":
           description: ""
-      summary: Register user account
+      summary: Login.
       tags:
       - users
 swagger: "2.0"

@@ -40,7 +40,6 @@ func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sen
 
 // Register registers new users.
 //
-// @Summary Register user account
 // @Tags users
 // @Accept json
 // @Produce json
@@ -50,6 +49,7 @@ func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sen
 // @Failure 400 {object} render.Error
 // @Failure 409 {object} render.Error
 // @Failure 500
+// @Summary Register user account.
 func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	user, publicErr := public.UserRegistrationFromJSON(req.Body, h.log)
 	if publicErr != nil {
@@ -90,7 +90,6 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 
 // Activate activates user account.
 //
-// @Summary Activate user account
 // @Tags users
 // @Accept json
 // @Produce json
@@ -99,6 +98,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 // @Success 200 {object} public.User
 // @Failure 400 {object} render.Error
 // @Failure 500
+// @Summary Activate user account.
 func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 	token := chi.URLParam(req, "token")
 	if token == "" {
@@ -129,7 +129,6 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 
 // Login logins user.
 //
-// @Summary Register user account
 // @Tags users
 // @Accept json
 // @Produce json
@@ -139,6 +138,7 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 // @Failure 400 {object} render.Error
 // @Failure 401 {object} render.Error
 // @Failure 500
+// @Summary Login.
 func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 	login, err := public.UserLoginFromJSON(req.Body)
 	if err != nil {
