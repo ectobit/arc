@@ -26,14 +26,13 @@ func NewUserRepository(conn *pgxpool.Pool, log lax.Logger) *UsersRepository {
 // Create creates new user in postgres repository.
 func (repo *UsersRepository) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
 	query := `INSERT INTO users (email, password) VALUES ($1, $2)
-		RETURNING id, email, password, created, updated, activation_token, active`
+		RETURNING id, email, password, created, activation_token, active`
 
 	row := repo.pool.QueryRow(ctx, query, email, password)
 
-	user := &User{} //nolint:exhaustivestruct
+	var user User
 
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated, &user.ActivationToken,
-		&user.Active)
+	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.ActivationToken, &user.Active)
 	if err != nil {
 		return nil, fmt.Errorf("create user: %w", toRepositoryError(err))
 	}
@@ -53,7 +52,7 @@ FROM users WHERE email=$1`
 
 	row := repo.pool.QueryRow(ctx, query, email)
 
-	user := &User{} //nolint:exhaustivestruct
+	var user User
 
 	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated,
 		&user.ActivationToken, &user.PasswordResetToken, &user.Active)
@@ -76,7 +75,7 @@ RETURNING id, email, password, created, updated`
 
 	row := repo.pool.QueryRow(ctx, query, token)
 
-	user := &User{} //nolint:exhaustivestruct
+	var user User
 
 	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated)
 	if err != nil {
@@ -102,7 +101,7 @@ RETURNING id, email, password_reset_token`
 
 	row := repo.pool.QueryRow(ctx, query, email)
 
-	user := &User{} //nolint:exhaustivestruct
+	var user User
 
 	err := row.Scan(&user.ID, &user.Email, &user.PasswordResetToken)
 	if err != nil {

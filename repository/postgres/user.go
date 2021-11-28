@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/jackc/pgtype"
 	"go.ectobit.com/arc/domain"
@@ -13,7 +12,7 @@ type User struct {
 	ID                 string
 	Email              string
 	Password           pgtype.Bytea
-	Created            *time.Time
+	Created            pgtype.Timestamptz
 	Updated            pgtype.Timestamptz
 	ActivationToken    pgtype.UUID
 	PasswordResetToken pgtype.UUID
@@ -23,26 +22,33 @@ type User struct {
 // DomainUser converts user entity to domain user.
 func (u *User) DomainUser() (*domain.User, error) {
 	domainUser := &domain.User{ //nolint:exhaustivestruct
-		ID:      u.ID,
-		Email:   u.Email,
-		Created: u.Created,
-		Active:  &u.Active,
+		ID:     u.ID,
+		Email:  u.Email,
+		Active: &u.Active,
 	}
 
-	if err := u.Password.AssignTo(&domainUser.Password); err != nil {
-		return nil, fmt.Errorf("assign password: %w", err)
+	if u.Password.Status == pgtype.Present {
+		domainUser.Password = u.Password.Bytes
 	}
 
-	if err := u.Updated.AssignTo(domainUser.Updated); err != nil {
-		return nil, fmt.Errorf("assign updated: %w", err)
+	if u.Created.Status == pgtype.Present {
+		domainUser.Created = &u.Created.Time
 	}
 
-	if err := u.ActivationToken.AssignTo(&domainUser.ActivationToken); err != nil {
-		return nil, fmt.Errorf("assign activation token: %w", err)
+	if u.Updated.Status == pgtype.Present {
+		domainUser.Updated = &u.Updated.Time
 	}
 
-	if err := u.PasswordResetToken.AssignTo(&domainUser.PasswordResetToken); err != nil {
-		return nil, fmt.Errorf("assign activation token: %w", err)
+	if u.ActivationToken.Status == pgtype.Present {
+		if err := u.ActivationToken.AssignTo(&domainUser.ActivationToken); err != nil {
+			return nil, fmt.Errorf("assign activation token: %w", err)
+		}
+	}
+
+	if u.PasswordResetToken.Status == pgtype.Present {
+		if err := u.PasswordResetToken.AssignTo(&domainUser.PasswordResetToken); err != nil {
+			return nil, fmt.Errorf("assign password reset token: %w", err)
+		}
 	}
 
 	return domainUser, nil
