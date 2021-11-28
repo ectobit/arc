@@ -22,6 +22,7 @@ import (
 	"go.ectobit.com/arc/mw"
 	"go.ectobit.com/arc/repository/postgres"
 	"go.ectobit.com/arc/send/smtp"
+	"go.ectobit.com/lax"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -114,10 +115,10 @@ func main() { //nolint:funlen
 	server := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: mux} //nolint:exhaustivestruct
 
 	go func() {
-		log.Info("listening", zap.Uint("port", cfg.Port))
+		log.Info("listening", lax.Uint("port", cfg.Port))
 
 		if err := server.ListenAndServe(); err != nil {
-			log.Warn("serve", zap.Error(err))
+			log.Warn("serve", lax.Error(err))
 		}
 	}()
 
@@ -133,10 +134,10 @@ func main() { //nolint:funlen
 
 	pool.Close()
 
-	_ = log.Sync()
+	log.Flush()
 }
 
-func mustCreateLogger(logFormat, logLevel string) *zap.Logger {
+func mustCreateLogger(logFormat, logLevel string) lax.Logger {
 	level := zap.NewAtomicLevel()
 
 	encodeLevel := zapcore.LowercaseLevelEncoder
@@ -164,12 +165,12 @@ func mustCreateLogger(logFormat, logLevel string) *zap.Logger {
 		ErrorOutputPaths: []string{"stderr"},
 	}
 
-	logger, err := config.Build(zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	logger, err := config.Build(zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
 	if err != nil {
 		exit("failed building log config", err)
 	}
 
-	return logger
+	return lax.NewZapAdapter(logger)
 }
 
 func mustParseURL(baseURL string) *url.URL {

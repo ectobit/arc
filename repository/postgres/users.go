@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/repository"
-	"go.uber.org/zap"
+	"go.ectobit.com/lax"
 )
 
 var _ repository.Users = (*UsersRepository)(nil)
@@ -15,24 +15,25 @@ var _ repository.Users = (*UsersRepository)(nil)
 // UsersRepository implements repository.Users interface using postgres backend.
 type UsersRepository struct {
 	pool *pgxpool.Pool
-	log  *zap.Logger
+	log  lax.Logger
 }
 
 // NewUserRepository creates new user repository in postgres database.
-func NewUserRepository(conn *pgxpool.Pool, log *zap.Logger) *UsersRepository {
+func NewUserRepository(conn *pgxpool.Pool, log lax.Logger) *UsersRepository {
 	return &UsersRepository{pool: conn, log: log}
 }
 
 // Create creates new user in postgres repository.
 func (repo *UsersRepository) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
 	query := `INSERT INTO users (email, password) VALUES ($1, $2)
-		RETURNING id, email, password, created, activation_token, active`
+		RETURNING id, email, password, created, updated, activation_token, active`
 
 	row := repo.pool.QueryRow(ctx, query, email, password)
 
 	user := &User{} //nolint:exhaustivestruct
 
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.ActivationToken, &user.Active)
+	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated, &user.ActivationToken,
+		&user.Active)
 	if err != nil {
 		return nil, fmt.Errorf("create user: %w", toRepositoryError(err))
 	}

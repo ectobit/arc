@@ -6,7 +6,7 @@ import (
 	"net/smtp"
 
 	"go.ectobit.com/arc/send"
-	"go.uber.org/zap"
+	"go.ectobit.com/lax"
 )
 
 var _ send.Sender = (*Mailer)(nil)
@@ -18,11 +18,11 @@ type Mailer struct {
 	username string
 	password string
 	sender   string
-	log      *zap.Logger
+	log      lax.Logger
 }
 
 // NewMailer creates mailer.
-func NewMailer(smtpHost string, smtpPort uint16, username, password, sender string, log *zap.Logger) *Mailer {
+func NewMailer(smtpHost string, smtpPort uint16, username, password, sender string, log lax.Logger) *Mailer {
 	return &Mailer{
 		smtpHost: smtpHost,
 		smtpPort: smtpPort,
@@ -39,7 +39,7 @@ func (m *Mailer) Send(recipient, subject, message string) error {
 	auth := smtp.PlainAuth("", m.username, m.password, m.smtpHost)
 	server := fmt.Sprintf("%s:%d", m.smtpHost, m.smtpPort)
 
-	m.log.Info("send mail", zap.String("server", server), zap.String("recipient", recipient))
+	m.log.Info("send mail", lax.String("server", server), lax.String("recipient", recipient))
 
 	if err := smtp.SendMail(server, auth, m.sender, []string{recipient}, msg); err != nil {
 		return fmt.Errorf("send mail: %w", err)

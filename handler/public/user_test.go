@@ -8,13 +8,14 @@ import (
 
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/handler/public"
+	"go.ectobit.com/lax"
 	"go.uber.org/zap/zaptest"
 )
 
 func TestUserRegistrationFromJSON(t *testing.T) {
 	t.Parallel()
 
-	log := zaptest.NewLogger(t)
+	log := lax.NewZapAdapter(zaptest.NewLogger(t))
 
 	tests := map[string]struct {
 		in      string
@@ -77,7 +78,7 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 func TestUserLoginFromJSON(t *testing.T) {
 	t.Parallel()
 
-	log := zaptest.NewLogger(t)
+	log := lax.NewZapAdapter(zaptest.NewLogger(t))
 
 	tests := map[string]struct {
 		in      string

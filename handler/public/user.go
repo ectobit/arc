@@ -9,7 +9,7 @@ import (
 
 	"github.com/nbutton23/zxcvbn-go"
 	"go.ectobit.com/arc/domain"
-	"go.uber.org/zap"
+	"go.ectobit.com/lax"
 )
 
 const minPasswordStrength = 3
@@ -41,17 +41,17 @@ type UserRegistration struct {
 	Email          string `json:"email"`
 	Password       string `json:"password"`
 	HashedPassword []byte `json:"-"`
-	log            *zap.Logger
+	log            lax.Logger
 }
 
 // UserRegistrationFromJSON parses user registration data from request body.
-func UserRegistrationFromJSON(body io.Reader, log *zap.Logger) (*UserRegistration, *Error) {
+func UserRegistrationFromJSON(body io.Reader, log lax.Logger) (*UserRegistration, *Error) {
 	var u UserRegistration
 
 	var err error
 
 	if err := json.NewDecoder(body).Decode(&u); err != nil {
-		log.Warn("decode json: %w", zap.Error(err))
+		log.Warn("decode json: %w", lax.Error(err))
 
 		return nil, NewBadRequestError("invalid json body")
 	}
@@ -74,7 +74,7 @@ func UserRegistrationFromJSON(body io.Reader, log *zap.Logger) (*UserRegistratio
 
 	u.HashedPassword, err = domain.HashPassword(u.Password)
 	if err != nil {
-		u.log.Warn("hash password", zap.Error(err))
+		u.log.Warn("hash password", lax.Error(err))
 
 		return nil, ErrorFromStatusCode(http.StatusInternalServerError)
 	}
@@ -89,11 +89,11 @@ type UserLogin struct {
 }
 
 // UserLoginFromJSON parses user login data from request body.
-func UserLoginFromJSON(body io.Reader, log *zap.Logger) (*UserLogin, *Error) {
+func UserLoginFromJSON(body io.Reader, log lax.Logger) (*UserLogin, *Error) {
 	var u UserLogin
 
 	if err := json.NewDecoder(body).Decode(&u); err != nil {
-		log.Warn("decode json: %w", zap.Error(err))
+		log.Warn("decode json: %w", lax.Error(err))
 
 		return nil, NewBadRequestError("invalid json body")
 	}

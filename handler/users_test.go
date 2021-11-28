@@ -13,6 +13,7 @@ import (
 	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
 	"go.ectobit.com/arc/repository/postgres"
+	"go.ectobit.com/lax"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -30,7 +31,7 @@ func TestRegister(t *testing.T) {
 
 	ctx := context.TODO()
 
-	log := zaptest.NewLogger(t)
+	log := lax.NewZapAdapter(zaptest.NewLogger(t))
 
 	render := render.NewJSON(log)
 

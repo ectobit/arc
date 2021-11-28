@@ -11,11 +11,12 @@ import (
 	"github.com/jackc/pgx/v4/log/zapadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.ectobit.com/arc/repository"
+	"go.ectobit.com/lax"
 	"go.uber.org/zap"
 )
 
 // Connect connects to postgres database.
-func Connect(ctx context.Context, dsn string, log *zap.Logger, logLevel string) (*pgxpool.Pool, error) {
+func Connect(ctx context.Context, dsn string, log lax.Logger, logLevel string) (*pgxpool.Pool, error) {
 	pgxLogLevel, err := pgx.LogLevelFromString(logLevel)
 	if err != nil {
 		return nil, fmt.Errorf("parse log level: %w", err)
@@ -26,7 +27,7 @@ func Connect(ctx context.Context, dsn string, log *zap.Logger, logLevel string) 
 		return nil, fmt.Errorf("postgres config: %w", err)
 	}
 
-	config.ConnConfig.Logger = zapadapter.NewLogger(log)
+	config.ConnConfig.Logger = zapadapter.NewLogger(log.Inner().(*zap.Logger))
 	config.ConnConfig.LogLevel = pgxLogLevel
 
 	pool, err := pgxpool.ConnectConfig(ctx, config)

@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go.uber.org/zap"
+	"go.ectobit.com/lax"
 )
 
 var _ Renderer = (*JSON)(nil)
 
 // JSON implements render.Renderer interface using JSON encoding.
 type JSON struct {
-	log *zap.Logger
+	log lax.Logger
 }
 
 // NewJSON creates JSON renderer.
-func NewJSON(log *zap.Logger) *JSON {
+func NewJSON(log lax.Logger) *JSON {
 	return &JSON{
 		log: log,
 	}
@@ -41,7 +41,7 @@ func (r *JSON) Render(res http.ResponseWriter, statusCode int, body interface{})
 	res.WriteHeader(statusCode)
 
 	if _, err := res.Write(data); err != nil {
-		r.log.Warn("response write", zap.Error(err))
+		r.log.Warn("response write", lax.Error(err))
 	}
 }
 

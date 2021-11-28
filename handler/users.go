@@ -12,7 +12,7 @@ import (
 	"go.ectobit.com/arc/handler/token"
 	"go.ectobit.com/arc/repository"
 	"go.ectobit.com/arc/send"
-	"go.uber.org/zap"
+	"go.ectobit.com/lax"
 )
 
 // UsersHandler contains user related http handlers.
@@ -22,12 +22,12 @@ type UsersHandler struct {
 	jwt       *token.JWT
 	sender    send.Sender
 	baseURL   string
-	log       *zap.Logger
+	log       lax.Logger
 }
 
 // NewUsersHandler creates users handler.
 func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sender send.Sender, baseURL string,
-	log *zap.Logger) *UsersHandler {
+	log lax.Logger) *UsersHandler {
 	return &UsersHandler{
 		r:         r,
 		usersRepo: ur,
@@ -66,7 +66,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		h.log.Warn("create user", zap.Error(err))
+		h.log.Warn("create user", lax.Error(err))
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
 		return
@@ -75,7 +75,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	message := fmt.Sprintf("%s/users/activate/%s", h.baseURL, domainUser.ActivationToken)
 
 	if err = h.sender.Send(domainUser.Email, "Account activation", message); err != nil {
-		h.log.Warn("send activation link", zap.Error(err))
+		h.log.Warn("send activation link", lax.Error(err))
 
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
@@ -115,7 +115,7 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		h.log.Warn("activate user account", zap.Error(err))
+		h.log.Warn("activate user account", lax.Error(err))
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
 		return
@@ -149,7 +149,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 
 	domainUser, err := h.usersRepo.FindByEmail(req.Context(), user.Email)
 	if err != nil {
-		h.log.Warn("find user by email", zap.Error(err))
+		h.log.Warn("find user by email", lax.Error(err))
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
 		return
@@ -171,7 +171,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 	requestID := middleware.GetReqID(req.Context())
 
 	if publicUser.AuthToken, publicUser.RefreshToken, err = h.jwt.Tokens(publicUser.ID, requestID); err != nil {
-		h.log.Warn("tokens", zap.Error(err))
+		h.log.Warn("tokens", lax.Error(err))
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
 		return
