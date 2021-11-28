@@ -1,4 +1,4 @@
-.PHONY: gen-swagger lint start stop test test-all test-all-ci test-cov
+.PHONY: gen-swagger lint start stop test test-all test-cov
 
 gen-swagger:
 	@swag init
@@ -22,11 +22,6 @@ test:
 test-all:
 	PGPASSWORD=arc psql -U postgres -h localhost -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
 	ARC_DB_HOST=localhost go test -race ./...
-
-test-all-ci:
-	PGPASSWORD=arc psql -U postgres -h postgres -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-	migrate -path=migrations -database='postgres://postgres:arc@postgres/test?sslmode=disable&query' up
-	ARC_DB_HOST=postgres go test -race ./...
 
 test-cov:
 	PGPASSWORD=arc psql -U postgres -h localhost -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'

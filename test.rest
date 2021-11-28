@@ -7,24 +7,6 @@ content-type: application/json
 	"password": "1_L57*Jo:4I0!EzUyY:ek8U0"
 }
 
-### Register user with empty password
-POST http://localhost:3000/users HTTP/1.1
-content-type: application/json
-
-{
-    "email": "john.doe@example.com",
-	"password": ""
-}
-
-### Register user with weak password
-POST http://localhost:3000/users HTTP/1.1
-content-type: application/json
-
-{
-    "email": "john.doe@example.com",
-	"password": "r00t"
-}
-
 ### Login
 POST http://localhost:3000/users/login HTTP/1.1
 content-type: application/json

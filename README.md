@@ -17,7 +17,7 @@ REST API in Go user accounting and authentication.
 - [x] User login
 - [x] Password strength check
 - [x] JWT based authentication
-- [ ] Good test coverage (just 26.9% at the moment)
+- [ ] Good test coverage (36.8% at the moment)
 - [x] Swagger specification
 - [ ] Authorization
 - [ ] Send messages to message queue
@@ -34,8 +34,3 @@ REST API in Go user accounting and authentication.
 - `make test-cov` displays test coverage (requires docker-stack to be up)
 
 ## [Swagger specification](http://localhost:3000/)
-
-## Links related to future tasks
-
-- [GitHub Actions - Running jobs in containers](https://docs.github.com/en/actions/using-containerized-services/creating-postgresql-service-containers)
-- [Control startup and shutdown order in Compose](https://docs.docker.com/compose/startup-order/)
