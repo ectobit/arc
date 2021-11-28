@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/ectobit/arc/workflows/build/badge.svg)](https://github.com/ectobit/arc/actions)
 [![Go Reference](https://pkg.go.dev/badge/go.ectobit.com/arc.svg)](https://pkg.go.dev/go.ectobit.com/arc)
 [![Go Report](https://goreportcard.com/badge/go.ectobit.com/arc)](https://goreportcard.com/report/go.ectobit.com/arc)
-![Test Coverage](https://img.shields.io/badge/coverage-46.3%25-brightgreen?style=flat&logo=go)
+![Test Coverage](https://img.shields.io/badge/coverage-47.6%25-brightgreen?style=flat&logo=go)
 [![License](https://img.shields.io/badge/license-BSD--2--Clause--Patent-orange.svg)](https://github.com/ectobit/arc/blob/main/LICENSE)
 
 REST API in Go user accounting and authentication.

@@ -45,15 +45,11 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 			got, gotErr := public.UserRegistrationFromJSON(buf, log)
 			if test.wantErr != "" {
 				if gotErr == nil {
-					t.Errorf("want error %q, got no error", test.wantErr)
-
-					return
+					t.Fatalf("want error %q, got no error", test.wantErr)
 				}
 
 				if gotErr.Error() != test.wantErr {
-					t.Errorf("want error %q, got error %q", test.wantErr, gotErr)
-
-					return
+					t.Fatalf("want error %q, got error %q", test.wantErr, gotErr)
 				}
 
 				return
@@ -107,15 +103,11 @@ func TestUserLoginFromJSON(t *testing.T) {
 			got, gotErr := public.UserLoginFromJSON(buf, log)
 			if test.wantErr != "" {
 				if gotErr == nil {
-					t.Errorf("want error %q, got no error", test.wantErr)
-
-					return
+					t.Fatalf("want error %q, got no error", test.wantErr)
 				}
 
 				if gotErr.Error() != test.wantErr {
-					t.Errorf("want error %q, got error %q", test.wantErr, gotErr)
-
-					return
+					t.Fatalf("want error %q, got error %q", test.wantErr, gotErr)
 				}
 
 				return
