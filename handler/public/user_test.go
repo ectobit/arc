@@ -25,8 +25,10 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 		"invalid email":     {`{"email":"a","password":""}`, nil, "invalid email"},
 		"empty password":    {`{"email":"john.doe@sixpack.com","password":""}`, nil, "empty password"},
 		"weak password":     {`{"email":"john.doe@sixpack.com","password":"pass"}`, nil, "weak password"},
-		"ok": {`{"email":"john.doe@sixpack.com","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
-			&public.UserRegistration{Email: "john.doe@sixpack.com", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, ""},
+		"ok": {
+			`{"email":"john.doe@sixpack.com","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
+			&public.UserRegistration{Email: "john.doe@sixpack.com", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustivestruct,lll
+		},
 	}
 
 	for n, test := range tests { //nolint:paralleltest
@@ -58,7 +60,8 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 				t.Errorf("\nwant %v,\n got %v", test.want, got)
 			}
 
-			domainUser := &domain.User{
+			domainUser := &domain.User{ //nolint:exhaustivestruct
+				Email:    got.Email,
 				Password: got.HashedPassword,
 			}
 
