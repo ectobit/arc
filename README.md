@@ -17,7 +17,7 @@ REST API in Go user accounting and authentication.
 - [x] User login
 - [x] Password strength check
 - [x] JWT based authentication
-- [ ] Good test coverage (just 8.5% at the moment)
+- [ ] Good test coverage (just 26.9% at the moment)
 - [x] Swagger specification
 - [ ] Authorization
 - [ ] Send messages to message queue
