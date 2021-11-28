@@ -140,41 +140,38 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 // @Failure 500
 // @Summary Login.
 func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
-	login, err := public.UserLoginFromJSON(req.Body)
-	if err != nil {
-		h.log.Warn("parse user login", zap.Error(err))
-		h.r.Render(res, http.StatusBadRequest, nil)
+	user, publicErr := public.UserLoginFromJSON(req.Body, h.log)
+	if publicErr != nil {
+		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
 
 		return
 	}
 
-	user, err := h.usersRepo.FindByEmail(req.Context(), login.Email)
+	domainUser, err := h.usersRepo.FindByEmail(req.Context(), user.Email)
 	if err != nil {
-		h.log.Warn("fetch user by email", zap.Error(err))
-
+		h.log.Warn("find user by email", zap.Error(err))
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
 		return
 	}
 
-	if !user.IsValidPassword(login.Password) {
+	if !domainUser.IsValidPassword(user.Password) {
 		h.r.Render(res, http.StatusUnauthorized, nil)
 
 		return
 	}
 
-	if !user.IsActive() {
+	if !domainUser.IsActive() {
 		h.r.Error(res, http.StatusUnauthorized, "account not activated")
 
 		return
 	}
 
-	publicUser := public.FromDomainUser(user)
+	publicUser := public.FromDomainUser(domainUser)
 	requestID := middleware.GetReqID(req.Context())
 
 	if publicUser.AuthToken, publicUser.RefreshToken, err = h.jwt.Tokens(publicUser.ID, requestID); err != nil {
 		h.log.Warn("tokens", zap.Error(err))
-
 		h.r.Render(res, http.StatusInternalServerError, nil)
 
 		return

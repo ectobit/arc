@@ -2,7 +2,6 @@ package public
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"regexp"
@@ -90,11 +89,17 @@ type UserLogin struct {
 }
 
 // UserLoginFromJSON parses user login data from request body.
-func UserLoginFromJSON(body io.Reader) (*UserLogin, error) {
+func UserLoginFromJSON(body io.Reader, log *zap.Logger) (*UserLogin, *Error) {
 	var u UserLogin
 
 	if err := json.NewDecoder(body).Decode(&u); err != nil {
-		return nil, fmt.Errorf("decode json: %w", err)
+		log.Warn("decode json: %w", zap.Error(err))
+
+		return nil, NewBadRequestError("invalid json body")
+	}
+
+	if u.Email == "" {
+		return nil, NewBadRequestError("empty email")
 	}
 
 	if !isValidEmail(u.Email) {
