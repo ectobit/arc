@@ -137,7 +137,7 @@ func main() { //nolint:funlen
 	log.Flush()
 }
 
-func mustCreateLogger(logFormat, logLevel string) lax.Logger {
+func mustCreateLogger(logFormat, logLevel string) *lax.ZapAdapter {
 	level := zap.NewAtomicLevel()
 
 	encodeLevel := zapcore.LowercaseLevelEncoder
