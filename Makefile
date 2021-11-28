@@ -21,6 +21,7 @@ test:
 
 test-all:
 	PGPASSWORD=arc psql -U postgres -h localhost -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
+	migrate -path=migrations -database='postgres://postgres:arc@localhost/test?sslmode=disable&query' up
 	ARC_DB_HOST=localhost go test -race ./...
 
 test-cov:

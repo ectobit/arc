@@ -3,21 +3,20 @@
 [![Build Status](https://github.com/ectobit/arc/workflows/build/badge.svg)](https://github.com/ectobit/arc/actions)
 [![Go Reference](https://pkg.go.dev/badge/go.ectobit.com/arc.svg)](https://pkg.go.dev/go.ectobit.com/arc)
 [![Go Report](https://goreportcard.com/badge/go.ectobit.com/arc)](https://goreportcard.com/report/go.ectobit.com/arc)
+![Test Coverage](https://img.shields.io/badge/coverage-46.3%25-brightgreen?style=flat&logo=go)
 [![License](https://img.shields.io/badge/license-BSD--2--Clause--Patent-orange.svg)](https://github.com/ectobit/arc/blob/main/LICENSE)
 
 REST API in Go user accounting and authentication.
 
 ## Features
 
-- [x] User registration
-- [x] Send mail for account activation
-- [x] Account activation
+- [x] User registration, send activation link per email, user account activation
+- [x] Password strength check
 - [ ] Send mail for password reset
 - [ ] Password reset
 - [x] User login
-- [x] Password strength check
 - [x] JWT based authentication
-- [ ] Good test coverage (38.9% at the moment)
+- [x] Tested
 - [x] Swagger specification
 - [ ] Authorization
 - [ ] Send messages to message queue

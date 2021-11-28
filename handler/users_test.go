@@ -1,8 +1,10 @@
 package handler_test
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -13,16 +15,75 @@ import (
 	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
 	"go.ectobit.com/arc/repository/postgres"
+	"go.ectobit.com/arc/send"
 	"go.ectobit.com/lax"
 	"go.uber.org/zap/zaptest"
 )
 
 func TestRegister(t *testing.T) {
+	t.Parallel()
+
 	if testing.Short() {
 		t.Skip()
 	}
 
-	t.Parallel()
+	serverURL := setup(t)
+
+	tests := map[string]struct {
+		in         string
+		wantStatus int
+		wantBody   string
+	}{
+		"invalid json body": {"", http.StatusBadRequest, `{"error":"invalid json body"}`},
+		"empty body":        {`{}`, http.StatusBadRequest, `{"error":"empty email"}`},
+		"all empty":         {`{"email":"","password":""}`, http.StatusBadRequest, `{"error":"empty email"}`},
+		"invalid email":     {`{"email":"a","password":""}`, http.StatusBadRequest, `{"error":"invalid email"}`},
+		"empty password":    {`{"email":"john.doe@sixpack.com","password":""}`, http.StatusBadRequest, `{"error":"empty password"}`},    //nolint:lll
+		"weak password":     {`{"email":"john.doe@sixpack.com","password":"pass"}`, http.StatusBadRequest, `{"error":"weak password"}`}, //nolint:lll
+		"ok": {
+			`{"email":"john.doe@sixpack.com","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
+			http.StatusCreated, "",
+		},
+	}
+
+	for n, test := range tests { //nolint:paralleltest
+		test := test
+
+		t.Run(n, func(t *testing.T) {
+			t.Parallel()
+
+			buf := bytes.NewBufferString(test.in)
+
+			gotRes, gotErr := http.DefaultClient.Post(serverURL, "application/json", buf) //nolint:noctx
+			if gotErr != nil {
+				t.Error(gotErr)
+			}
+
+			defer func() {
+				err := gotRes.Body.Close()
+				if err != nil {
+					t.Error(err)
+				}
+			}()
+
+			if gotRes.StatusCode != test.wantStatus {
+				t.Errorf("want status %d, got status %d", test.wantStatus, gotRes.StatusCode)
+			}
+
+			gotBody, gotErr := io.ReadAll(gotRes.Body)
+			if gotErr != nil {
+				t.Error(gotErr)
+			}
+
+			if test.wantBody != "" && string(gotBody) != test.wantBody {
+				t.Errorf("want %s, got %s", test.wantBody, string(gotBody))
+			}
+		})
+	}
+}
+
+func setup(t *testing.T) string {
+	t.Helper()
 
 	databaseName := os.Getenv("ARC_DB_HOST")
 	if databaseName == "" {
@@ -41,7 +102,11 @@ func TestRegister(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer conn.Close()
+	t.Cleanup(conn.Close)
+
+	if _, err := conn.Exec(context.TODO(), "TRUNCATE users"); err != nil {
+		t.Error(err)
+	}
 
 	usersRepository := postgres.NewUserRepository(conn, log)
 
@@ -50,23 +115,9 @@ func TestRegister(t *testing.T) {
 		t.Error(err)
 	}
 
-	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, nil, "", log)
+	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, &send.Fake{}, "", log)
 
 	server := httptest.NewServer(http.HandlerFunc(usersHandler.Register))
 
-	res, err := http.DefaultClient.Get(server.URL) //nolint:noctx
-	if err != nil {
-		t.Error(err)
-	}
-
-	defer func() {
-		err := res.Body.Close()
-		if err != nil {
-			t.Error(err)
-		}
-	}()
-
-	if res.StatusCode != http.StatusBadRequest {
-		t.Errorf("want %d, got %d", http.StatusBadRequest, res.StatusCode)
-	}
+	return server.URL
 }
