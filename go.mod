@@ -13,7 +13,7 @@ require (
 	github.com/swaggo/http-swagger v1.1.2
 	github.com/swaggo/swag v1.7.6
 	go.ectobit.com/act v0.2.2
-	go.ectobit.com/lax v0.0.0-20211128141234-66bd107dedb8
+	go.ectobit.com/lax v0.0.0-20211128173353-2ddcbbde63f2
 	go.uber.org/zap v1.19.1
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
 )
