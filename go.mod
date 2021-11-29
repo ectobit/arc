@@ -7,7 +7,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.0.2
 	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/jackc/pgconn v1.10.1
-	github.com/jackc/pgtype v1.9.0
+	github.com/jackc/pgtype v1.9.1
 	github.com/jackc/pgx/v4 v4.14.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
 	github.com/swaggo/http-swagger v1.1.2
