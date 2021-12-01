@@ -23,8 +23,6 @@ import (
 	"go.ectobit.com/arc/repository/postgres"
 	"go.ectobit.com/arc/send/smtp"
 	"go.ectobit.com/lax"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 // Version of the application to be defined dynamically by linker flags.
@@ -138,39 +136,12 @@ func main() { //nolint:funlen
 }
 
 func mustCreateLogger(logFormat, logLevel string) *lax.ZapAdapter {
-	level := zap.NewAtomicLevel()
-
-	encodeLevel := zapcore.LowercaseLevelEncoder
-	if logLevel == "debug" {
-		encodeLevel = zapcore.CapitalColorLevelEncoder
-	}
-
-	config := zap.Config{ //nolint:exhaustivestruct
-		Level:       level,
-		Development: logLevel == "debug",
-		Encoding:    logFormat,
-		EncoderConfig: zapcore.EncoderConfig{ //nolint:exhaustivestruct
-			CallerKey:      "caller",
-			EncodeCaller:   zapcore.ShortCallerEncoder,
-			EncodeDuration: zapcore.StringDurationEncoder,
-			EncodeLevel:    encodeLevel,
-			EncodeTime:     zapcore.ISO8601TimeEncoder,
-			LevelKey:       "level",
-			MessageKey:     "msg",
-			NameKey:        "logger",
-			StacktraceKey:  "stack",
-		},
-
-		OutputPaths:      []string{"stdout"},
-		ErrorOutputPaths: []string{"stderr"},
-	}
-
-	logger, err := config.Build(zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
+	log, err := lax.NewDefaultZapAdapter(logFormat, logLevel)
 	if err != nil {
-		exit("failed building log config", err)
+		exit("crate logger", err)
 	}
 
-	return lax.NewZapAdapter(logger)
+	return log
 }
 
 func mustParseURL(baseURL string) *url.URL {
