@@ -33,3 +33,13 @@ REST API in Go user accounting and authentication.
 - `make test-cov` displays test coverage (requires docker-stack to be up)
 
 ## [Swagger specification](http://localhost:3000/)
+
+## Tips
+
+If token should be parsed from query as well:
+
+```
+r.Use(func(next http.Handler) http.Handler {
+    return jwtauth.Verify(s.jwtAuth, jwtauth.TokenFromQuery, jwtauth.TokenFromHeader, jwtauth.TokenFromCookie)(next)
+})
+```

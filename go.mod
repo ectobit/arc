@@ -12,6 +12,7 @@ require (
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
 	github.com/swaggo/http-swagger v1.1.2
 	github.com/swaggo/swag v1.7.6
+	github.com/unrolled/secure v1.0.9
 	go.ectobit.com/act v0.2.2
 	go.ectobit.com/lax v0.0.0-20211201145546-6adabeadf2c5
 	go.uber.org/zap v1.19.1

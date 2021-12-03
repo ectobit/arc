@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/unrolled/secure"
 	"go.ectobit.com/act"
 	"go.ectobit.com/arc/docs"
 	"go.ectobit.com/arc/handler"
@@ -29,6 +30,7 @@ import (
 var Version = time.Now().Local().Format("20060102150405") //nolint:gochecknoglobals
 
 type config struct {
+	Development     bool
 	Port            uint          `def:"3000"`
 	ShutdownTimeout time.Duration `def:"30s"`
 	DSN             string        `def:"postgres://postgres:arc@postgres:5432/arc?sslmode=disable&pool_max_conns=10"` //nolint:lll
@@ -45,8 +47,8 @@ type config struct {
 		Password string
 		Sender   string
 	}
-	ExtBaseURL string `help:"external server base url" def:"http://localhost:3000"`
-	Log        struct {
+	ExternalURL act.URL `help:"external server base url" def:"http://localhost:3000"`
+	Log         struct {
 		Format string `help:"log format [console|json]" def:"console"`
 		Level  string `def:"debug"`
 	}
@@ -69,11 +71,10 @@ func main() { //nolint:funlen
 		exit("parsing flags", err)
 	}
 
-	u := mustParseURL(cfg.ExtBaseURL)
 	docs.SwaggerInfo.Version = Version
-	docs.SwaggerInfo.Host = u.Host
-	docs.SwaggerInfo.BasePath = u.Path
-	docs.SwaggerInfo.Schemes = []string{u.Scheme}
+	docs.SwaggerInfo.Host = cfg.ExternalURL.Host
+	docs.SwaggerInfo.BasePath = cfg.ExternalURL.Path
+	docs.SwaggerInfo.Schemes = []string{cfg.ExternalURL.Scheme}
 
 	log := mustCreateLogger(cfg.Log.Format, cfg.Log.Level)
 
@@ -82,6 +83,7 @@ func main() { //nolint:funlen
 	mux.Use(middleware.Heartbeat("/health"))
 	mux.Use(mw.ZapLogger(log))
 	mux.Use(middleware.Recoverer)
+	mux.Use(hsts(cfg.Development, cfg.ExternalURL.URL).Handler)
 
 	pool, err := postgres.Connect(context.TODO(), cfg.DSN, log, cfg.Log.Level)
 	if err != nil {
@@ -97,10 +99,10 @@ func main() { //nolint:funlen
 	usersRepository := postgres.NewUserRepository(pool, log)
 	mailer := smtp.NewMailer(cfg.SMTP.Host, uint16(cfg.SMTP.Port), cfg.SMTP.Username, cfg.SMTP.Password,
 		cfg.SMTP.Sender, log)
-	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExtBaseURL, log)
+	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExternalURL.String(), log)
 
 	mux.Get("/*", httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("%s/doc.json", cfg.ExtBaseURL)),
+		httpSwagger.URL(fmt.Sprintf("%s/doc.json", cfg.ExternalURL)),
 	))
 	mux.Post("/users", usersHandler.Register)
 	mux.Post("/users/login", usersHandler.Login)
@@ -144,13 +146,21 @@ func mustCreateLogger(logFormat, logLevel string) *lax.ZapAdapter {
 	return log
 }
 
-func mustParseURL(baseURL string) *url.URL {
-	u, err := url.Parse(baseURL)
-	if err != nil {
-		exit("parse base url", err)
-	}
-
-	return u
+func hsts(development bool, externalURL *url.URL) *secure.Secure {
+	return secure.New(secure.Options{ //nolint:exhaustivestruct
+		IsDevelopment:         development,
+		AllowedHosts:          []string{externalURL.Host},
+		HostsProxyHeaders:     []string{"X-Forwarded-Host"},
+		SSLRedirect:           true,
+		SSLHost:               externalURL.Host,
+		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		STSSeconds:            31536000, //nolint:gomnd
+		STSPreload:            true,
+		FrameDeny:             true,
+		ContentTypeNosniff:    true,
+		BrowserXssFilter:      true,
+		ContentSecurityPolicy: "script-src $NONCE",
+	})
 }
 
 func exit(message string, err error) {

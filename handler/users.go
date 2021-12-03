@@ -17,24 +17,24 @@ import (
 
 // UsersHandler contains user related http handlers.
 type UsersHandler struct {
-	r         render.Renderer
-	usersRepo repository.Users
-	jwt       *token.JWT
-	sender    send.Sender
-	baseURL   string
-	log       lax.Logger
+	r           render.Renderer
+	usersRepo   repository.Users
+	jwt         *token.JWT
+	sender      send.Sender
+	externalURL string
+	log         lax.Logger
 }
 
 // NewUsersHandler creates users handler.
-func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sender send.Sender, baseURL string,
+func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sender send.Sender, externalURL string,
 	log lax.Logger) *UsersHandler {
 	return &UsersHandler{
-		r:         r,
-		usersRepo: ur,
-		jwt:       jwt,
-		sender:    sender,
-		baseURL:   baseURL,
-		log:       log,
+		r:           r,
+		usersRepo:   ur,
+		jwt:         jwt,
+		sender:      sender,
+		externalURL: externalURL,
+		log:         log,
 	}
 }
 
@@ -72,7 +72,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	message := fmt.Sprintf("%s/users/activate/%s", h.baseURL, domainUser.ActivationToken)
+	message := fmt.Sprintf("%s/users/activate/%s", h.externalURL, domainUser.ActivationToken)
 
 	if err = h.sender.Send(domainUser.Email, "Account activation", message); err != nil {
 		h.log.Warn("send activation link", lax.Error(err))

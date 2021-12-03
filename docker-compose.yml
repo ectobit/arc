@@ -42,6 +42,7 @@ services:
     environment:
       - RACE_DETECTOR=1
       - TZ=Europe/Berlin
+      - ARC_DEVELOPMENT=true
       - ARC_JWT_SECRET
       - ARC_SMTP_HOST
       - ARC_SMTP_PORT
