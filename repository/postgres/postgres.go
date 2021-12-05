@@ -26,6 +26,7 @@ func Connect(ctx context.Context, dsn string, log pgx.Logger, logLevel string) (
 
 	config.ConnConfig.Logger = log
 	config.ConnConfig.LogLevel = pgxLogLevel
+	config.LazyConnect = true
 
 	pool, err := pgxpool.ConnectConfig(ctx, config)
 	if err != nil {
