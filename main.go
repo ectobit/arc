@@ -164,6 +164,6 @@ func hsts(development bool, externalURL *url.URL) *secure.Secure {
 }
 
 func exit(message string, err error) {
-	fmt.Fprintf(os.Stderr, "%s: %v", message, err)
+	fmt.Fprintf(os.Stderr, "%s: %v\n", message, err)
 	os.Exit(1)
 }
