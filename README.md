@@ -43,8 +43,3 @@ r.Use(func(next http.Handler) http.Handler {
     return jwtauth.Verify(s.jwtAuth, jwtauth.TokenFromQuery, jwtauth.TokenFromHeader, jwtauth.TokenFromCookie)(next)
 })
 ```
-
-## Links useful for further development
-
-- [Writing an application using Go and PostgreSQL](https://henvic.dev/posts/go-postgres/)
-- [pgxtutorial](https://github.com/henvic/pgxtutorial)

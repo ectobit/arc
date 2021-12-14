@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/repository"
@@ -32,8 +34,8 @@ func (repo *UsersRepository) Create(ctx context.Context, email string, password 
 
 	var user User
 
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.ActivationToken, &user.Active)
-	if err != nil {
+	if err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.ActivationToken,
+		&user.Active); err != nil {
 		return nil, fmt.Errorf("create user: %w", toRepositoryError(err))
 	}
 
@@ -54,9 +56,8 @@ FROM users WHERE email=$1`
 
 	var user User
 
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated,
-		&user.ActivationToken, &user.PasswordResetToken, &user.Active)
-	if err != nil {
+	if err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated,
+		&user.ActivationToken, &user.PasswordResetToken, &user.Active); err != nil {
 		return nil, fmt.Errorf("find user: %w", err)
 	}
 
@@ -77,9 +78,8 @@ RETURNING id, email, password, created, updated`
 
 	var user User
 
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated)
-	if err != nil {
-		if err.Error() == "no rows in result set" {
+	if err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, repository.ErrInvalidActivation
 		}
 
@@ -96,16 +96,15 @@ RETURNING id, email, password, created, updated`
 
 // PasswordResetToken sets password reset token for a user in postgres repository.
 func (repo *UsersRepository) PasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
-	query := `UPDATE users SET password_reset_token=uuid_generate_v4() WHERE active=TRUE AND email=$1
+	query := `UPDATE users SET password_reset_token=gen_random_uuid() WHERE active=TRUE AND email=$1
 RETURNING id, email, password_reset_token`
 
 	row := repo.pool.QueryRow(ctx, query, email)
 
 	var user User
 
-	err := row.Scan(&user.ID, &user.Email, &user.PasswordResetToken)
-	if err != nil {
-		if err.Error() == "no rows in result set" {
+	if err := row.Scan(&user.ID, &user.Email, &user.PasswordResetToken); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, repository.ErrInvalidAccount
 		}
 

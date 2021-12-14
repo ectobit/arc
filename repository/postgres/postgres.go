@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.ectobit.com/arc/repository"
@@ -41,7 +42,8 @@ func toRepositoryError(err error) error {
 
 	if errors.As(err, &pgErr) {
 		switch pgErr.Code { //nolint:gocritic
-		case "23505":
+		case pgerrcode.UniqueViolation:
+			// pgErr.ConstraintName may also be checked
 			return repository.ErrDuplicateKey
 		}
 	}

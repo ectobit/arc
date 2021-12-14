@@ -32,7 +32,7 @@ var Version = time.Now().Local().Format("20060102150405") //nolint:gochecknoglob
 type config struct {
 	Development     bool
 	Port            uint          `def:"3000"`
-	ShutdownTimeout time.Duration `def:"30s"`
+	ShutdownTimeout time.Duration `def:"10s"`
 	DSN             string        `def:"postgres://postgres:arc@postgres:5432/arc?sslmode=disable&pool_max_conns=10"` //nolint:lll
 	JWT             struct {
 		Issuer          string `def:"arc"`
@@ -85,7 +85,7 @@ func main() { //nolint:funlen
 	mux.Use(middleware.Recoverer)
 	mux.Use(hsts(cfg.Development, cfg.ExternalURL.URL).Handler)
 
-	pool, err := postgres.Connect(context.TODO(), cfg.DSN, log, cfg.Log.Level)
+	pool, err := postgres.Connect(context.Background(), cfg.DSN, log, cfg.Log.Level)
 	if err != nil {
 		exit("postgres", err)
 	}
@@ -129,7 +129,7 @@ func main() { //nolint:funlen
 	defer cancel()
 
 	if err = server.Shutdown(ctx); err != nil {
-		exit("server shutdown", err)
+		log.Warn("server shutdown", lax.Error(err))
 	}
 
 	pool.Close()

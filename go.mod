@@ -7,6 +7,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.0.2
 	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/jackc/pgconn v1.10.1
+	github.com/jackc/pgerrcode v0.0.0-20201024163028-a0d42d470451
 	github.com/jackc/pgtype v1.9.1
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
@@ -14,9 +15,9 @@ require (
 	github.com/swaggo/swag v1.7.6
 	github.com/unrolled/secure v1.0.9
 	go.ectobit.com/act v0.2.2
-	go.ectobit.com/lax v0.0.0-20211206161358-a998ce7d0bd7
+	go.ectobit.com/lax v0.0.0-20211209220847-12e74df0a8d3
 	go.uber.org/zap v1.19.1
-	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
+	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b
 )
 
 require (
