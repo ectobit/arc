@@ -107,6 +107,15 @@ jobs:
             type=semver,pattern={{major}}
             type=edge
             type=sha
+      - name: Set up linker flags
+        id: flags
+        run: |
+          VERSION=$(git describe --abbrev=0 --tags)
+          BUILD_HASH=$(git rev-parse --short HEAD)
+          REVISION=$(git rev-parse HEAD)
+          BUILD_DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          LD_FLAGS="-s -w -extldflags '-static' -X main.version=${VERSION}-${BUILD_HASH} -X main.revision=${REVISION} -X main.buildDate=${BUILD_DATE}"
+          echo ::set-output name=flags::${LD_FLAGS}
       - name: Login to container registry
         uses: docker/login-action@v1.10.0
         with:
@@ -115,6 +124,7 @@ jobs:
       - name: Build and push image to container registry
         uses: docker/build-push-action@v2.7.0
         with:
+          build-args: LD_FLAGS="${{ steps.flags.outputs.flags }}"
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}

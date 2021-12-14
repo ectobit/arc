@@ -26,9 +26,6 @@ import (
 	"go.ectobit.com/lax"
 )
 
-// Version of the application to be defined dynamically by linker flags.
-var Version = time.Now().Local().Format("20060102150405") //nolint:gochecknoglobals
-
 type config struct {
 	Development     bool
 	Port            uint          `def:"3000"`
@@ -71,7 +68,7 @@ func main() { //nolint:funlen
 		exit("parsing flags", err)
 	}
 
-	docs.SwaggerInfo.Version = Version
+	docs.SwaggerInfo.Version = version
 	docs.SwaggerInfo.Host = cfg.ExternalURL.Host
 	docs.SwaggerInfo.BasePath = cfg.ExternalURL.Path
 	docs.SwaggerInfo.Schemes = []string{cfg.ExternalURL.Scheme}
@@ -115,7 +112,8 @@ func main() { //nolint:funlen
 	server := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: mux} //nolint:exhaustivestruct
 
 	go func() {
-		log.Info("listening", lax.Uint("port", cfg.Port))
+		log.Info("listening", lax.Uint("port", cfg.Port), lax.String("version", version),
+			lax.String("revision", revision), lax.String("build date", buildDate))
 
 		if err := server.ListenAndServe(); err != nil {
 			log.Warn("serve", lax.Error(err))
