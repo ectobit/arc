@@ -5,77 +5,77 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.17.5
-      - name: Set up cache
-        uses: actions/cache@v2.1.7
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Set up linters
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
-          curl -sSL -o /usr/local/bin/nancy https://github.com/sonatype-nexus-community/nancy/releases/download/v1.0.29/nancy-v1.0.29-linux-amd64 && chmod 755 /usr/local/bin/nancy
-      - name: Check out
-        uses: actions/checkout@v2.4.0
-      - name: Lint
-        run: |
-          make lint
-          go list -json -m all | nancy sleuth
-      - name: Lint Dockerfile
-        uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: Dockerfile
-          ignore: DL3018
-  test:
-    runs-on: ubuntu-latest
-    needs: lint
-    container: golang:1.17.5
-    services:
-      postgres:
-        image: postgres:14-alpine
-        env:
-          POSTGRES_PASSWORD: arc
-          POSTGRES_DB: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - name: Check out
-        uses: actions/checkout@v2.4.0
-      - name: Set up dependencies
-        run: |
-          apt-get update && apt-get install -y postgresql-client-13
-          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.1/migrate.linux-amd64.tar.gz | tar zx -C /usr/local/bin
-      - name: Set up cache
-        uses: actions/cache@v2.1.7
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Run migrations
-        env:
-          PGPASSWORD: arc
-        run: |
-          psql -U postgres -h postgres -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-          migrate -path=migrations -database='postgres://postgres:arc@postgres/test?sslmode=disable&query' up
-      - name: Test
-        env:
-          ARC_DB_HOST: postgres
-        run: go test -race ./...
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Set up go
+  #       uses: actions/setup-go@v2
+  #       with:
+  #         go-version: 1.17.5
+  #     - name: Set up cache
+  #       uses: actions/cache@v2.1.7
+  #       with:
+  #         path: ~/go/pkg/mod
+  #         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-go-
+  #     - name: Set up linters
+  #       run: |
+  #         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
+  #         curl -sSL -o /usr/local/bin/nancy https://github.com/sonatype-nexus-community/nancy/releases/download/v1.0.29/nancy-v1.0.29-linux-amd64 && chmod 755 /usr/local/bin/nancy
+  #     - name: Check out
+  #       uses: actions/checkout@v2.4.0
+  #     - name: Lint
+  #       run: |
+  #         make lint
+  #         go list -json -m all | nancy sleuth
+  #     - name: Lint Dockerfile
+  #       uses: hadolint/hadolint-action@v1.6.0
+  #       with:
+  #         dockerfile: Dockerfile
+  #         ignore: DL3018
+  # test:
+  #   runs-on: ubuntu-latest
+  #   needs: lint
+  #   container: golang:1.17.5
+  #   services:
+  #     postgres:
+  #       image: postgres:14-alpine
+  #       env:
+  #         POSTGRES_PASSWORD: arc
+  #         POSTGRES_DB: test
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #   steps:
+  #     - name: Check out
+  #       uses: actions/checkout@v2.4.0
+  #     - name: Set up dependencies
+  #       run: |
+  #         apt-get update && apt-get install -y postgresql-client-13
+  #         curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.1/migrate.linux-amd64.tar.gz | tar zx -C /usr/local/bin
+  #     - name: Set up cache
+  #       uses: actions/cache@v2.1.7
+  #       with:
+  #         path: ~/go/pkg/mod
+  #         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-go-
+  #     - name: Run migrations
+  #       env:
+  #         PGPASSWORD: arc
+  #       run: |
+  #         psql -U postgres -h postgres -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
+  #         migrate -path=migrations -database='postgres://postgres:arc@postgres/test?sslmode=disable&query' up
+  #     - name: Test
+  #       env:
+  #         ARC_DB_HOST: postgres
+  #       run: go test -race ./...
   build:
     runs-on: ubuntu-latest
-    needs: test
+    # needs: test
     steps:
       - name: Check out
         uses: actions/checkout@v2.3.5
@@ -110,6 +110,7 @@ jobs:
       - name: Set up linker flags
         id: flags
         run: |
+          env
           VERSION=$(git describe --abbrev=0 --tags)
           BUILD_HASH=$(git rev-parse --short HEAD)
           REVISION=$(git rev-parse HEAD)
