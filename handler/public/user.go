@@ -113,14 +113,14 @@ func UserLoginFromJSON(body io.Reader, log lax.Logger) (*UserLogin, *Error) {
 	return &u, nil
 }
 
-// RequestPasswordReset contains user email to request password reset.
-type RequestPasswordReset struct {
+// Email contains user email.
+type Email struct {
 	Email string `json:"email"`
 }
 
-// RequestPasswordResetFromJSON parses password reset request data from request body.
-func RequestPasswordResetFromJSON(body io.Reader, log lax.Logger) (*RequestPasswordReset, *Error) {
-	var rpr RequestPasswordReset
+// EmailFromJSON parses email from request body.
+func EmailFromJSON(body io.Reader, log lax.Logger) (*Email, *Error) {
+	var rpr Email
 
 	if err := json.NewDecoder(body).Decode(&rpr); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
@@ -137,6 +137,38 @@ func RequestPasswordResetFromJSON(body io.Reader, log lax.Logger) (*RequestPassw
 	}
 
 	return &rpr, nil
+}
+
+// Password contains user password.
+type Password struct {
+	Password string `json:"password"`
+}
+
+// PasswordFromJSON parses password from request body.
+func PasswordFromJSON(body io.Reader, log lax.Logger) (*Password, *Error) {
+	var cps Password
+
+	if err := json.NewDecoder(body).Decode(&cps); err != nil {
+		log.Warn("decode json: %w", lax.Error(err))
+
+		return nil, NewBadRequestError("invalid json body")
+	}
+
+	if cps.Password == "" {
+		return nil, NewBadRequestError("empty password")
+	}
+
+	return &cps, nil
+}
+
+// Strength creates password strength.
+func (p *Password) Strength() *PasswordStrength {
+	return &PasswordStrength{Strength: uint8(zxcvbn.PasswordStrength(p.Password, nil).Score)}
+}
+
+// PasswordStrength contains password strength.
+type PasswordStrength struct {
+	Strength uint8 `json:"strength"`
 }
 
 func isWeakPassword(plainPassword string) bool {

@@ -121,6 +121,42 @@ var doc = `{
                 }
             }
         },
+        "/users/check-password": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Calculate password strength.",
+                "parameters": [
+                    {
+                        "description": "Password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/public.Password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/render.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "consumes": [
@@ -194,7 +230,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/public.RequestPasswordReset"
+                            "$ref": "#/definitions/public.Email"
                         }
                     }
                 ],
@@ -222,10 +258,18 @@ var doc = `{
         }
     },
     "definitions": {
-        "public.RequestPasswordReset": {
+        "public.Email": {
             "type": "object",
             "properties": {
                 "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "public.Password": {
+            "type": "object",
+            "properties": {
+                "password": {
                     "type": "string"
                 }
             }

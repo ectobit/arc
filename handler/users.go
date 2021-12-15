@@ -196,21 +196,21 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 // @Accept json
 // @Produce json
 // @Router /users/reset-password [post]
-// @Param email body public.RequestPasswordReset true "E-mail address"
+// @Param email body public.Email true "E-mail address"
 // @Success 202
 // @Failure 400 {object} render.Error
 // @Failure 404 {object} render.Error
 // @Failure 500
 // @Summary Request password reset.
 func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.Request) {
-	rpr, publicErr := public.RequestPasswordResetFromJSON(req.Body, h.log)
+	email, publicErr := public.EmailFromJSON(req.Body, h.log)
 	if publicErr != nil {
 		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
 
 		return
 	}
 
-	user, err := h.usersRepo.FindByEmailWithPasswordResetToken(req.Context(), rpr.Email)
+	user, err := h.usersRepo.FindByEmailWithPasswordResetToken(req.Context(), email.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			h.r.Error(res, http.StatusNotFound, err.Error())
@@ -235,4 +235,25 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 	}
 
 	h.r.Render(res, http.StatusAccepted, nil)
+}
+
+// CheckPasswordStrength calculates password strength.
+//
+// @Tags users
+// @Accept json
+// @Produce json
+// @Router /users/check-password [post]
+// @Param password body public.Password true "Password"
+// @Success 200
+// @Failure 400 {object} render.Error
+// @Summary Calculate password strength.
+func (h *UsersHandler) CheckPasswordStrength(res http.ResponseWriter, req *http.Request) {
+	password, publicErr := public.PasswordFromJSON(req.Body, h.log)
+	if publicErr != nil {
+		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+
+		return
+	}
+
+	h.r.Render(res, http.StatusOK, password.Strength())
 }

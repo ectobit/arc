@@ -20,9 +20,17 @@ content-type: application/json
 GET http://localhost:3000/users/activate/926c7bed-18a7-4c0f-97fd-f5901b2c52ba HTTP/1.1
 
 ### Request password reset
-POST http://localhost:3000/users/reset-password/boban.acimovic@gmail.com HTTP/1.1
+POST http://localhost:3000/users/reset-password HTTP/1.1
 content-type: application/json
 
 {
-    "email": "boban.acimovic@gmail.com",
+    "email": "boban.acimovic@gmail.com"
+}
+
+### Check password strength
+POST http://localhost:3000/users/check-password HTTP/1.1
+content-type: application/json
+
+{
+    "password": "h+z67{GxLSL~]Cl(I88AqV7w"
 }

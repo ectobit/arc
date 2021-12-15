@@ -1,7 +1,12 @@
 definitions:
-  public.RequestPasswordReset:
+  public.Email:
     properties:
       email:
+        type: string
+    type: object
+  public.Password:
+    properties:
+      password:
         type: string
     type: object
   public.User:
@@ -108,6 +113,29 @@ paths:
       summary: Activate user account.
       tags:
       - users
+  /users/check-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/public.Password'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.Error'
+      summary: Calculate password strength.
+      tags:
+      - users
   /users/login:
     post:
       consumes:
@@ -153,7 +181,7 @@ paths:
         name: email
         required: true
         schema:
-          $ref: '#/definitions/public.RequestPasswordReset'
+          $ref: '#/definitions/public.Email'
       produces:
       - application/json
       responses:
