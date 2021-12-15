@@ -118,6 +118,7 @@ type RequestPasswordReset struct {
 	Email string `json:"email"`
 }
 
+// RequestPasswordResetFromJSON parses password reset request data from request body.
 func RequestPasswordResetFromJSON(body io.Reader, log lax.Logger) (*RequestPasswordReset, *Error) {
 	var rpr RequestPasswordReset
 
