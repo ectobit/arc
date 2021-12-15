@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.3
 FROM golang:1.17.5-alpine AS builder
 
-ARG LD_FLAGS="-s -w -extldflags '-static'"
+ARG LD_FLAGS='-s -w -extldflags "-static"'
 
 RUN --mount=type=cache,target=/var/cache/apk if [ "${TARGETPLATFORM}" = "linux/amd64" ]; \
     then apk add --no-cache tzdata upx; \
