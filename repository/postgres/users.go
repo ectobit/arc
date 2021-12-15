@@ -88,7 +88,8 @@ func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domai
 }
 
 // FindByEmailWithPasswordResetToken sets password reset token for a user in postgres repository.
-func (repo *UsersRepository) FindByEmailWithPasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
+func (repo *UsersRepository) FindByEmailWithPasswordResetToken(ctx context.Context,
+	email string) (*domain.User, error) {
 	query := `UPDATE users SET password_reset_token=gen_random_uuid()
 WHERE email=$1 AND active=TRUE AND password_reset_token IS NULL
 RETURNING id, email, password_reset_token`

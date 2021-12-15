@@ -115,5 +115,5 @@ func setup(t *testing.T) *handler.UsersHandler {
 		t.Error(err)
 	}
 
-	return handler.NewUsersHandler(render, usersRepository, jwt, &send.Fake{}, "", log)
+	return handler.NewUsersHandler(render, usersRepository, jwt, &send.Fake{}, "", "", log)
 }

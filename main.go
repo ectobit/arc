@@ -45,7 +45,7 @@ type config struct {
 		Sender   string
 	}
 	ExternalURL               act.URL `help:"external server base url" def:"http://localhost:3000"`
-	FrontendPasswordResetPath string  `def:"password-reset-path"`
+	FrontendPasswordResetPath string  `def:"frontend-password-reset-path"`
 	Log                       struct {
 		Format string `help:"log format [console|json]" def:"console"`
 		Level  string `def:"debug"`

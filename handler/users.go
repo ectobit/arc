@@ -30,12 +30,13 @@ type UsersHandler struct {
 func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sender send.Sender, externalURL string,
 	frontendPasswordResetPath string, log lax.Logger) *UsersHandler {
 	return &UsersHandler{
-		r:           r,
-		usersRepo:   ur,
-		jwt:         jwt,
-		sender:      sender,
-		externalURL: externalURL,
-		log:         log,
+		r:                         r,
+		usersRepo:                 ur,
+		jwt:                       jwt,
+		sender:                    sender,
+		externalURL:               externalURL,
+		frontendPasswordResetPath: frontendPasswordResetPath,
+		log:                       log,
 	}
 }
 
@@ -189,7 +190,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 	h.r.Render(res, http.StatusOK, publicUser)
 }
 
-// Activate activates user account.
+// PasswordResetToken requests password reset.
 //
 // @Tags users
 // @Accept json
