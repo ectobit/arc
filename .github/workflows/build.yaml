@@ -110,12 +110,17 @@ jobs:
       - name: Set up linker flags
         id: flags
         run: |
-          env
-          VERSION=$(git describe --abbrev=0 --tags)
-          BUILD_HASH=$(git rev-parse --short HEAD)
-          REVISION=$(git rev-parse HEAD)
+          if  [[ $GITHUB_REF == refs/tags/* ]]; then
+            # VERSION=$(git describe --abbrev=0 --tags)
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            # VERSION=$(git rev-parse --short HEAD)
+            VERSION=${GITHUB_SHA::8}
+          fi
+          # REVISION=$(git rev-parse HEAD)
+          REVISION=${GITHUB_SHA}
           BUILD_DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-          LD_FLAGS="-s -w -extldflags '-static' -X main.version=${VERSION}-${BUILD_HASH} -X main.revision=${REVISION} -X main.buildDate=${BUILD_DATE}"
+          LD_FLAGS="-s -w -extldflags '-static' -X main.version=${VERSION} -X main.revision=${REVISION} -X main.buildDate=${BUILD_DATE}"
           echo ::set-output name=flags::${LD_FLAGS}
       - name: Login to container registry
         uses: docker/login-action@v1.10.0
