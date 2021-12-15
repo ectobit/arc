@@ -106,7 +106,7 @@ func main() { //nolint:funlen
 	mux.Post("/users", usersHandler.Register)
 	mux.Post("/users/login", usersHandler.Login)
 	mux.Get("/users/activate/{token}", usersHandler.Activate)
-	mux.Get("/users/password-reset/{email}", usersHandler.PasswordResetToken)
+	mux.Get("/users/reset-password/{email}", usersHandler.RequestPasswordReset)
 	mux.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(jwt.JWTAuth()))
 		r.Use(jwtauth.Authenticator)
@@ -149,18 +149,17 @@ func mustCreateLogger(logFormat, logLevel string) *lax.ZapAdapter {
 
 func hsts(development bool, externalURL *url.URL) *secure.Secure {
 	return secure.New(secure.Options{ //nolint:exhaustivestruct
-		IsDevelopment:         development,
-		AllowedHosts:          []string{externalURL.Host},
-		HostsProxyHeaders:     []string{"X-Forwarded-Host"},
-		SSLRedirect:           true,
-		SSLHost:               externalURL.Host,
-		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
-		STSSeconds:            31536000, //nolint:gomnd
-		STSPreload:            true,
-		FrameDeny:             true,
-		ContentTypeNosniff:    true,
-		BrowserXssFilter:      true,
-		ContentSecurityPolicy: "script-src $NONCE",
+		IsDevelopment:      development,
+		AllowedHosts:       []string{externalURL.Host},
+		HostsProxyHeaders:  []string{"X-Forwarded-Host"},
+		SSLRedirect:        true,
+		SSLHost:            externalURL.Host,
+		SSLProxyHeaders:    map[string]string{"X-Forwarded-Proto": "https"},
+		STSSeconds:         31536000, //nolint:gomnd
+		STSPreload:         true,
+		FrameDeny:          true,
+		ContentTypeNosniff: true,
+		BrowserXssFilter:   true,
 	})
 }
 

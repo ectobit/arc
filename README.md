@@ -12,7 +12,7 @@ REST API in Go user accounting and authentication.
 
 - [x] User registration, send activation link per email, user account activation
 - [x] Password strength check
-- [ ] Send mail for password reset
+- [x] Send mail for password reset
 - [ ] Password reset
 - [x] User login
 - [x] JWT based authentication

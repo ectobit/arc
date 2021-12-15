@@ -190,19 +190,19 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 	h.r.Render(res, http.StatusOK, publicUser)
 }
 
-// PasswordResetToken requests password reset.
+// RequestPasswordReset requests password reset.
 //
 // @Tags users
 // @Accept json
 // @Produce json
-// @Router /users/password-reset/{email} [get]
-// @Param email path string true "E-mail"
+// @Router /users/reset-password/{email} [get]
+// @Param email path string true "User e-mail address"
 // @Success 202
 // @Failure 400 {object} render.Error
 // @Failure 404 {object} render.Error
 // @Failure 500
-// @Summary Activate user account.
-func (h *UsersHandler) PasswordResetToken(res http.ResponseWriter, req *http.Request) {
+// @Summary Request password reset.
+func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.Request) {
 	email := chi.URLParam(req, "email")
 	if email == "" {
 		h.r.Render(res, http.StatusBadRequest, nil)
