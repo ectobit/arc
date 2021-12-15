@@ -195,22 +195,22 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Router /users/reset-password/{email} [get]
-// @Param email path string true "User e-mail address"
+// @Router /users/reset-password [post]
+// @Param email body public.RequestPasswordReset true "E-mail address"
 // @Success 202
 // @Failure 400 {object} render.Error
 // @Failure 404 {object} render.Error
 // @Failure 500
 // @Summary Request password reset.
 func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.Request) {
-	email := chi.URLParam(req, "email")
-	if email == "" {
-		h.r.Render(res, http.StatusBadRequest, nil)
+	rpr, publicErr := public.RequestPasswordResetFromJSON(req.Body, h.log)
+	if publicErr != nil {
+		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
 
 		return
 	}
 
-	user, err := h.usersRepo.FindByEmailWithPasswordResetToken(req.Context(), email)
+	user, err := h.usersRepo.FindByEmailWithPasswordResetToken(req.Context(), rpr.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			h.r.Error(res, http.StatusNotFound, err.Error())

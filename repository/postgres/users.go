@@ -68,8 +68,7 @@ FROM users WHERE email=$1`
 // Activate activates user account in postgres repository.
 func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domain.User, error) {
 	query := `UPDATE users SET updated=now(), activation_token=NULL, active=TRUE
-		WHERE activation_token=$1 AND active=FALSE
-		RETURNING id, email, password, created, updated`
+		WHERE activation_token=$1 RETURNING id, email, password, created, updated`
 
 	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), token)
 
@@ -91,8 +90,7 @@ func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domai
 func (repo *UsersRepository) FindByEmailWithPasswordResetToken(ctx context.Context,
 	email string) (*domain.User, error) {
 	query := `UPDATE users SET password_reset_token=gen_random_uuid()
-WHERE email=$1 AND active=TRUE AND password_reset_token IS NULL
-RETURNING id, email, password_reset_token`
+WHERE email=$1 AND active=TRUE RETURNING id, email, password_reset_token`
 
 	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), email)
 

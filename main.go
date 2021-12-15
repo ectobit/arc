@@ -107,7 +107,7 @@ func main() { //nolint:funlen
 	mux.Post("/users", usersHandler.Register)
 	mux.Post("/users/login", usersHandler.Login)
 	mux.Get("/users/activate/{token}", usersHandler.Activate)
-	mux.Get("/users/reset-password/{email}", usersHandler.RequestPasswordReset)
+	mux.Post("/users/reset-password", usersHandler.RequestPasswordReset)
 	mux.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(jwt.JWTAuth()))
 		r.Use(jwtauth.Authenticator)

@@ -175,8 +175,8 @@ var doc = `{
                 }
             }
         },
-        "/users/reset-password/{email}": {
-            "get": {
+        "/users/reset-password": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
@@ -189,11 +189,13 @@ var doc = `{
                 "summary": "Request password reset.",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User e-mail address",
+                        "description": "E-mail address",
                         "name": "email",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/public.RequestPasswordReset"
+                        }
                     }
                 ],
                 "responses": {
@@ -220,6 +222,14 @@ var doc = `{
         }
     },
     "definitions": {
+        "public.RequestPasswordReset": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "public.User": {
             "type": "object",
             "properties": {

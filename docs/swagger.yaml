@@ -1,4 +1,9 @@
 definitions:
+  public.RequestPasswordReset:
+    properties:
+      email:
+        type: string
+    type: object
   public.User:
     properties:
       authToken:
@@ -138,16 +143,17 @@ paths:
       summary: Login.
       tags:
       - users
-  /users/reset-password/{email}:
-    get:
+  /users/reset-password:
+    post:
       consumes:
       - application/json
       parameters:
-      - description: User e-mail address
-        in: path
+      - description: E-mail address
+        in: body
         name: email
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/public.RequestPasswordReset'
       produces:
       - application/json
       responses:

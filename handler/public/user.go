@@ -113,6 +113,31 @@ func UserLoginFromJSON(body io.Reader, log lax.Logger) (*UserLogin, *Error) {
 	return &u, nil
 }
 
+// RequestPasswordReset contains user email to request password reset.
+type RequestPasswordReset struct {
+	Email string `json:"email"`
+}
+
+func RequestPasswordResetFromJSON(body io.Reader, log lax.Logger) (*RequestPasswordReset, *Error) {
+	var rpr RequestPasswordReset
+
+	if err := json.NewDecoder(body).Decode(&rpr); err != nil {
+		log.Warn("decode json: %w", lax.Error(err))
+
+		return nil, NewBadRequestError("invalid json body")
+	}
+
+	if rpr.Email == "" {
+		return nil, NewBadRequestError("empty email")
+	}
+
+	if !isValidEmail(rpr.Email) {
+		return nil, NewBadRequestError("invalid email")
+	}
+
+	return &rpr, nil
+}
+
 func isWeakPassword(plainPassword string) bool {
 	return zxcvbn.PasswordStrength(plainPassword, nil).Score < minPasswordStrength
 }
