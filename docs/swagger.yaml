@@ -138,12 +138,12 @@ paths:
       summary: Login.
       tags:
       - users
-  /users/password-reset/{email}:
+  /users/reset-password/{email}:
     get:
       consumes:
       - application/json
       parameters:
-      - description: E-mail
+      - description: User e-mail address
         in: path
         name: email
         required: true
@@ -163,7 +163,7 @@ paths:
             $ref: '#/definitions/render.Error'
         "500":
           description: ""
-      summary: Activate user account.
+      summary: Request password reset.
       tags:
       - users
 swagger: "2.0"

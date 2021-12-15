@@ -175,7 +175,7 @@ var doc = `{
                 }
             }
         },
-        "/users/password-reset/{email}": {
+        "/users/reset-password/{email}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -186,11 +186,11 @@ var doc = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Activate user account.",
+                "summary": "Request password reset.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "E-mail",
+                        "description": "User e-mail address",
                         "name": "email",
                         "in": "path",
                         "required": true
