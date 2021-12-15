@@ -94,6 +94,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/render.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/render.Error'
         "500":
           description: ""
       summary: Activate user account.
@@ -125,9 +129,41 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/render.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/render.Error'
         "500":
           description: ""
       summary: Login.
+      tags:
+      - users
+  /users/password-reset/{email}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: E-mail
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/render.Error'
+        "500":
+          description: ""
+      summary: Activate user account.
       tags:
       - users
 swagger: "2.0"

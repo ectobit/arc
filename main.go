@@ -44,8 +44,9 @@ type config struct {
 		Password string
 		Sender   string
 	}
-	ExternalURL act.URL `help:"external server base url" def:"http://localhost:3000"`
-	Log         struct {
+	ExternalURL               act.URL `help:"external server base url" def:"http://localhost:3000"`
+	FrontendPasswordResetPath string  `def:"password-reset-path"`
+	Log                       struct {
 		Format string `help:"log format [console|json]" def:"console"`
 		Level  string `def:"debug"`
 	}
@@ -96,7 +97,8 @@ func main() { //nolint:funlen
 	usersRepository := postgres.NewUserRepository(pool)
 	mailer := smtp.NewMailer(cfg.SMTP.Host, uint16(cfg.SMTP.Port), cfg.SMTP.Username, cfg.SMTP.Password,
 		cfg.SMTP.Sender, log)
-	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExternalURL.String(), log)
+	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExternalURL.String(),
+		cfg.FrontendPasswordResetPath, log)
 
 	mux.Get("/*", httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("%s/doc.json", cfg.ExternalURL)),
@@ -104,6 +106,7 @@ func main() { //nolint:funlen
 	mux.Post("/users", usersHandler.Register)
 	mux.Post("/users/login", usersHandler.Login)
 	mux.Get("/users/activate/{token}", usersHandler.Activate)
+	mux.Get("/users/password-reset/{email}", usersHandler.PasswordResetToken)
 	mux.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(jwt.JWTAuth()))
 		r.Use(jwtauth.Authenticator)

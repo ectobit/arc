@@ -2,10 +2,8 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/repository"
@@ -56,7 +54,7 @@ FROM users WHERE email=$1`
 
 	if err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated,
 		&user.ActivationToken, &user.PasswordResetToken, &user.Active); err != nil {
-		return nil, repositoryError("find user", err)
+		return nil, repositoryError("find user by email", err)
 	}
 
 	domainUser, err := user.DomainUser()
@@ -89,8 +87,8 @@ func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domai
 	return domainUser, nil
 }
 
-// ResetPassword sets password reset token for a user in postgres repository.
-func (repo *UsersRepository) ResetPassword(ctx context.Context, email string) (*domain.User, error) {
+// FindByEmailWithPasswordResetToken sets password reset token for a user in postgres repository.
+func (repo *UsersRepository) FindByEmailWithPasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
 	query := `UPDATE users SET password_reset_token=gen_random_uuid()
 WHERE email=$1 AND active=TRUE AND password_reset_token IS NULL
 RETURNING id, email, password_reset_token`
@@ -100,7 +98,7 @@ RETURNING id, email, password_reset_token`
 	var user User
 
 	if err := row.Scan(&user.ID, &user.Email, &user.PasswordResetToken); err != nil {
-		return nil, repositoryError("reset password", err)
+		return nil, repositoryError("find user by email and set pasword reset token", err)
 	}
 
 	domainUser, err := user.DomainUser()

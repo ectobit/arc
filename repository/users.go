@@ -17,6 +17,6 @@ type Users interface {
 	FindByEmail(ctx context.Context, email string) (*domain.User, error)
 	// Activate activates user account in repository.
 	Activate(ctx context.Context, token string) (*domain.User, error)
-	// ResetPassword sets password reset token for a user in repository.
-	ResetPassword(ctx context.Context, email string) (*domain.User, error)
+	// FindByEmailWithPasswordResetToken sets password reset token for a user in repository.
+	FindByEmailWithPasswordResetToken(ctx context.Context, email string) (*domain.User, error)
 }
