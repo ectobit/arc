@@ -8,8 +8,8 @@ import (
 	"go.ectobit.com/lax"
 )
 
-// ZapLogger is middleware for logging requests using zap logger.
-func ZapLogger(logger lax.Logger) func(next http.Handler) http.Handler {
+// LaxLogger is middleware for logging requests using lax logger interface.
+func LaxLogger(logger lax.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			start := time.Now()

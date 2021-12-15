@@ -12,7 +12,7 @@ POST http://localhost:3000/users/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "john.doe@sixpack.com",
+    "email": "boban.acimovic@gmail.com",
 	"password": "h+z67{GxLSL~]Cl(I88AqV7w"
 }
 
@@ -20,4 +20,4 @@ content-type: application/json
 GET http://localhost:3000/users/activate/926c7bed-18a7-4c0f-97fd-f5901b2c52ba HTTP/1.1
 
 ### Request password reset
-GET http://localhost:3000/users/password-reset/boban.acimovic@gmail.com HTTP/1.1
+GET http://localhost:3000/users/reset-password/boban.acimovic@gmail.com HTTP/1.1

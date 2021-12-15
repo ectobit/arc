@@ -15,6 +15,7 @@ REST API in Go user accounting and authentication.
 - [x] Send mail for password reset
 - [ ] Password reset
 - [x] User login
+- [ ] Refresh token
 - [x] JWT based authentication
 - [x] Tested
 - [x] Swagger specification

@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/casbin/casbin"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth/v5"
@@ -79,7 +80,7 @@ func main() { //nolint:funlen
 	mux := chi.NewRouter()
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.Heartbeat("/health"))
-	mux.Use(mw.ZapLogger(log))
+	mux.Use(mw.LaxLogger(log))
 	mux.Use(middleware.Recoverer)
 	mux.Use(hsts(cfg.Development, cfg.ExternalURL.URL).Handler)
 
@@ -110,6 +111,7 @@ func main() { //nolint:funlen
 	mux.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(jwt.JWTAuth()))
 		r.Use(jwtauth.Authenticator)
+		r.Use(mw.Authorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
 	})
 
 	server := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: mux} //nolint:exhaustivestruct
