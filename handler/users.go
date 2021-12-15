@@ -60,7 +60,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 
 	domainUser, err := h.usersRepo.Create(req.Context(), user.Email, user.HashedPassword)
 	if err != nil {
-		if errors.Is(err, repository.ErrDuplicateKey) {
+		if errors.Is(err, repository.ErrUniqueViolation) {
 			h.r.Error(res, http.StatusConflict, "already registered")
 
 			return
@@ -109,7 +109,7 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 
 	user, err := h.usersRepo.Activate(req.Context(), token)
 	if err != nil {
-		if errors.Is(err, repository.ErrInvalidActivation) {
+		if errors.Is(err, repository.ErrResourceNotFound) {
 			h.r.Error(res, http.StatusBadRequest, err.Error())
 
 			return
@@ -149,6 +149,12 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 
 	domainUser, err := h.usersRepo.FindByEmail(req.Context(), user.Email)
 	if err != nil {
+		if errors.Is(err, repository.ErrResourceNotFound) {
+			h.r.Error(res, http.StatusBadRequest, err.Error())
+
+			return
+		}
+
 		h.log.Warn("find user by email", lax.Error(err))
 		h.r.Render(res, http.StatusInternalServerError, nil)
 

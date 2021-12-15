@@ -93,7 +93,7 @@ func main() { //nolint:funlen
 	}
 
 	render := render.NewJSON(log)
-	usersRepository := postgres.NewUserRepository(pool, log)
+	usersRepository := postgres.NewUserRepository(pool)
 	mailer := smtp.NewMailer(cfg.SMTP.Host, uint16(cfg.SMTP.Port), cfg.SMTP.Username, cfg.SMTP.Password,
 		cfg.SMTP.Sender, log)
 	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExternalURL.String(), log)

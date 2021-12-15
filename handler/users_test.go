@@ -108,7 +108,7 @@ func setup(t *testing.T) *handler.UsersHandler {
 		t.Error(err)
 	}
 
-	usersRepository := postgres.NewUserRepository(conn, log)
+	usersRepository := postgres.NewUserRepository(conn)
 
 	jwt, err := token.NewJWT("test", "test", time.Hour, time.Hour)
 	if err != nil {

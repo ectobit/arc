@@ -2,17 +2,12 @@ package repository
 
 import (
 	"context"
-	"errors"
+	"regexp"
 
 	"go.ectobit.com/arc/domain"
 )
 
-// Errors.
-var (
-	ErrDuplicateKey      = errors.New("duplicate key")
-	ErrInvalidActivation = errors.New("account already activated or invalid activation token")
-	ErrInvalidAccount    = errors.New("email not found or account not activated")
-)
+var regex = regexp.MustCompile(`\s+`)
 
 // Users abstracts users repository methods.
 type Users interface {
@@ -22,6 +17,6 @@ type Users interface {
 	FindByEmail(ctx context.Context, email string) (*domain.User, error)
 	// Activate activates user account in repository.
 	Activate(ctx context.Context, token string) (*domain.User, error)
-	// PasswordResetToken sets password reset token for a user in repository.
-	PasswordResetToken(ctx context.Context, email string) (*domain.User, error)
+	// ResetPassword sets password reset token for a user in repository.
+	ResetPassword(ctx context.Context, email string) (*domain.User, error)
 }

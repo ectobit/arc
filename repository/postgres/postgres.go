@@ -37,16 +37,20 @@ func Connect(ctx context.Context, dsn string, log pgx.Logger, logLevel string) (
 	return pool, nil
 }
 
-func toRepositoryError(err error) error {
+func repositoryError(description string, err error) error {
+	if errors.Is(err, pgx.ErrNoRows) {
+		return repository.ErrResourceNotFound
+	}
+
 	pgErr := &pgconn.PgError{} //nolint:exhaustivestruct
 
 	if errors.As(err, &pgErr) {
 		switch pgErr.Code { //nolint:gocritic
 		case pgerrcode.UniqueViolation:
 			// pgErr.ConstraintName may also be checked
-			return repository.ErrDuplicateKey
+			return repository.ErrUniqueViolation
 		}
 	}
 
-	return err
+	return fmt.Errorf("%s: %w", description, err)
 }
