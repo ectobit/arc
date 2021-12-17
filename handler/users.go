@@ -151,7 +151,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := h.usersRepo.FindByEmail(req.Context(), userLogin.Email)
+	user, err := h.usersRepo.FetchByEmail(req.Context(), userLogin.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			h.r.Error(res, http.StatusNotFound, err.Error())
@@ -210,7 +210,7 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 		return
 	}
 
-	user, err := h.usersRepo.FindByEmailWithPasswordResetToken(req.Context(), email.Email)
+	user, err := h.usersRepo.FetchPasswordResetToken(req.Context(), email.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			h.r.Error(res, http.StatusNotFound, err.Error())
@@ -256,4 +256,44 @@ func (h *UsersHandler) CheckPasswordStrength(res http.ResponseWriter, req *http.
 	}
 
 	h.r.Render(res, http.StatusOK, password.Strength())
+}
+
+// ResetPassword sets new user's password.
+//
+// @Tags users
+// @Accept json
+// @Produce json
+// @Router /users/reset-password [patch]
+// @Param resetPassword body public.ResetPassword true "Password reset token and new password"
+// @Success 200 {object} public.User
+// @Failure 400 {object} render.Error
+// @Failure 404 {object} render.Error
+// @Failure 500
+// @Summary Set new user's password.
+func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request) {
+	resetPassword, publicErr := public.ResetPasswordFromJSON(req.Body, h.log)
+	if publicErr != nil {
+		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+
+		return
+	}
+
+	user, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken, resetPassword.HashedPassword)
+	if err != nil {
+		if errors.Is(err, repository.ErrResourceNotFound) {
+			h.r.Error(res, http.StatusNotFound, err.Error())
+
+			return
+		}
+
+		h.log.Warn("reset password", lax.Error(err))
+		h.r.Render(res, http.StatusInternalServerError, nil)
+
+		return
+	}
+
+	publicUser := public.FromDomainUser(user)
+	publicUser.ID = ""
+
+	h.r.Render(res, http.StatusAccepted, publicUser)
 }

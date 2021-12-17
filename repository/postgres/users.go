@@ -11,17 +11,17 @@ import (
 
 var _ repository.Users = (*UsersRepository)(nil)
 
-// UsersRepository implements repository.Users interface using postgres backend.
+// UsersRepository implements repository.Users interface using PostgreSQL database.
 type UsersRepository struct {
 	pool *pgxpool.Pool
 }
 
-// NewUserRepository creates new user repository in postgres database.
+// NewUserRepository creates new users repository using PostgreSQL database.
 func NewUserRepository(conn *pgxpool.Pool) *UsersRepository {
 	return &UsersRepository{pool: conn}
 }
 
-// Create creates new user in postgres repository.
+// Create creates new user in PostgreSQL database.
 func (repo *UsersRepository) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
 	query := `INSERT INTO users (email, password) VALUES ($1, $2)
 		RETURNING id, email, password, created, activation_token, active`
@@ -43,8 +43,8 @@ func (repo *UsersRepository) Create(ctx context.Context, email string, password 
 	return domainUser, nil
 }
 
-// FindByEmail fetches user from postgres repository using email address.
-func (repo *UsersRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
+// FetchByEmail fetches user from PostgreSQL database using email address.
+func (repo *UsersRepository) FetchByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := `SELECT id, email, password, created, updated, activation_token, password_reset_token, active
 FROM users WHERE email=$1`
 
@@ -54,7 +54,7 @@ FROM users WHERE email=$1`
 
 	if err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated,
 		&user.ActivationToken, &user.PasswordResetToken, &user.Active); err != nil {
-		return nil, repositoryError("find user by email", err)
+		return nil, repositoryError("fetch user by email", err)
 	}
 
 	domainUser, err := user.DomainUser()
@@ -65,7 +65,7 @@ FROM users WHERE email=$1`
 	return domainUser, nil
 }
 
-// Activate activates user account in postgres repository.
+// Activate activates user account in PostgreSQL database.
 func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domain.User, error) {
 	query := `UPDATE users SET updated=now(), activation_token=NULL, active=TRUE
 		WHERE activation_token=$1 RETURNING id, email, password, created, updated`
@@ -86,9 +86,8 @@ func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domai
 	return domainUser, nil
 }
 
-// FindByEmailWithPasswordResetToken sets password reset token for a user in postgres repository.
-func (repo *UsersRepository) FindByEmailWithPasswordResetToken(ctx context.Context,
-	email string) (*domain.User, error) {
+// FetchPasswordResetToken sets user's password reset token in PostgreSQL repository.
+func (repo *UsersRepository) FetchPasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
 	query := `UPDATE users SET password_reset_token=gen_random_uuid()
 WHERE email=$1 AND active=TRUE RETURNING id, email, password_reset_token`
 
@@ -97,7 +96,29 @@ WHERE email=$1 AND active=TRUE RETURNING id, email, password_reset_token`
 	var user User
 
 	if err := row.Scan(&user.ID, &user.Email, &user.PasswordResetToken); err != nil {
-		return nil, repositoryError("find user by email and set pasword reset token", err)
+		return nil, repositoryError("fetch pasword reset token", err)
+	}
+
+	domainUser, err := user.DomainUser()
+	if err != nil {
+		return nil, fmt.Errorf("convert to domain user: %w", err)
+	}
+
+	return domainUser, nil
+}
+
+// ResetPassword sets new user's password in PostgreSQL database.
+func (repo *UsersRepository) ResetPassword(ctx context.Context, passwordResetToken string,
+	password []byte) (*domain.User, error) {
+	query := `UPDATE users SET password=$1, password_reset_token=NULL
+WHERE password_reset_token=$2 AND active=TRUE RETURNING id, email`
+
+	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), password, passwordResetToken)
+
+	var user User
+
+	if err := row.Scan(&user.ID, &user.Email); err != nil {
+		return nil, repositoryError("reset password", err)
 	}
 
 	domainUser, err := user.DomainUser()
