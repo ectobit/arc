@@ -178,7 +178,7 @@ func isValidEmail(email string) bool {
 	return emailRegex.MatchString(email)
 }
 
-// Password reset token contains user's password reset token and new password to be set.
+// ResetPassword contains user's password reset token and new password to be set.
 type ResetPassword struct {
 	PasswordResetToken string `json:"passwordResetToken"`
 	Password           string `json:"password"`
