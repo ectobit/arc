@@ -19,7 +19,6 @@ import (
 	"go.ectobit.com/act"
 	"go.ectobit.com/arc/docs"
 	"go.ectobit.com/arc/handler"
-	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
 	"go.ectobit.com/arc/mw"
 	"go.ectobit.com/arc/repository/postgres"
@@ -94,11 +93,10 @@ func main() { //nolint:funlen
 		exit("jwt token", err)
 	}
 
-	render := render.NewJSON(log)
 	usersRepository := postgres.NewUserRepository(pool)
 	mailer := smtp.NewMailer(cfg.SMTP.Host, uint16(cfg.SMTP.Port), cfg.SMTP.Username, cfg.SMTP.Password,
 		cfg.SMTP.Sender, log)
-	usersHandler := handler.NewUsersHandler(render, usersRepository, jwt, mailer, cfg.ExternalURL.String(),
+	usersHandler := handler.NewUsersHandler(usersRepository, jwt, mailer, cfg.ExternalURL.String(),
 		cfg.FrontendPasswordResetPath, log)
 
 	mux.Get("/*", httpSwagger.Handler(

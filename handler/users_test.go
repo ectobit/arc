@@ -11,7 +11,6 @@ import (
 
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/handler"
-	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
 	"go.ectobit.com/arc/repository"
 	"go.ectobit.com/arc/send"
@@ -28,7 +27,7 @@ func TestRegister(t *testing.T) { //nolint:funlen
 	}
 
 	log := lax.NewZapAdapter(zaptest.NewLogger(t))
-	usersHandler := handler.NewUsersHandler(render.NewJSON(log), &usersRepositoryFake{}, jwt, &send.Fake{}, "", "", log)
+	usersHandler := handler.NewUsersHandler(&usersRepositoryFake{}, jwt, &send.Fake{}, "", "", log)
 	server := httptest.NewServer(http.HandlerFunc(usersHandler.Register))
 
 	tests := map[string]struct {

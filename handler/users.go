@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"go.ectobit.com/arc/handler/public"
-	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/request"
 	"go.ectobit.com/arc/handler/response"
 	"go.ectobit.com/arc/handler/token"
@@ -19,7 +18,6 @@ import (
 
 // UsersHandler contains user related http handlers.
 type UsersHandler struct {
-	r                         render.Renderer
 	usersRepo                 repository.Users
 	jwt                       *token.JWT
 	sender                    send.Sender
@@ -29,10 +27,9 @@ type UsersHandler struct {
 }
 
 // NewUsersHandler creates users handler.
-func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sender send.Sender, externalURL string,
+func NewUsersHandler(ur repository.Users, jwt *token.JWT, sender send.Sender, externalURL string,
 	frontendPasswordResetPath string, log lax.Logger) *UsersHandler {
 	return &UsersHandler{
-		r:                         r,
 		usersRepo:                 ur,
 		jwt:                       jwt,
 		sender:                    sender,
@@ -55,9 +52,9 @@ func NewUsersHandler(r render.Renderer, ur repository.Users, jwt *token.JWT, sen
 // @Failure 500
 // @Summary Register user account.
 func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
-	userRegistration, publicErr := public.UserRegistrationFromJSON(req.Body, h.log)
-	if publicErr != nil {
-		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+	userRegistration, err := public.UserRegistrationFromJSON(req.Body, h.log)
+	if err != nil {
+		response.RenderError(res, err, h.log)
 
 		return
 	}
@@ -65,13 +62,13 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	user, err := h.usersRepo.Create(req.Context(), userRegistration.Email, userRegistration.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrUniqueViolation) {
-			h.r.Error(res, http.StatusConflict, "already registered")
+			response.RenderErrorStatus(res, http.StatusConflict, "already registered", h.log)
 
 			return
 		}
 
 		h.log.Warn("create user", lax.Error(err))
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
@@ -81,7 +78,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	if err = h.sender.Send(user.Email, "Account activation", message); err != nil {
 		h.log.Warn("send activation link", lax.Error(err))
 
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
@@ -89,7 +86,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 	publicUser := public.FromDomainUser(user)
 	publicUser.ID = ""
 
-	h.r.Render(res, http.StatusCreated, publicUser)
+	response.Render(res, http.StatusCreated, publicUser, h.log)
 }
 
 // Activate activates user account.
@@ -107,7 +104,7 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 	token := chi.URLParam(req, "token")
 	if token == "" {
-		h.r.Render(res, http.StatusBadRequest, nil)
+		response.Render(res, http.StatusBadRequest, nil, h.log)
 
 		return
 	}
@@ -115,13 +112,13 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 	user, err := h.usersRepo.Activate(req.Context(), token)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
-			h.r.Error(res, http.StatusNotFound, err.Error())
+			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
 
 			return
 		}
 
 		h.log.Warn("activate user account", lax.Error(err))
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
@@ -129,7 +126,7 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 	publicUser := public.FromDomainUser(user)
 	publicUser.ID = ""
 
-	h.r.Render(res, http.StatusOK, publicUser)
+	response.Render(res, http.StatusOK, publicUser, h.log)
 }
 
 // Login logins user.
@@ -146,9 +143,9 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 // @Failure 500
 // @Summary Login.
 func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
-	userLogin, publicErr := public.UserLoginFromJSON(req.Body, h.log)
-	if publicErr != nil {
-		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+	userLogin, err := public.UserLoginFromJSON(req.Body, h.log)
+	if err != nil {
+		response.RenderError(res, err, h.log)
 
 		return
 	}
@@ -156,25 +153,25 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 	user, err := h.usersRepo.FindOneByEmail(req.Context(), userLogin.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
-			h.r.Error(res, http.StatusNotFound, err.Error())
+			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
 
 			return
 		}
 
 		h.log.Warn("find user by email", lax.Error(err))
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
 
 	if !user.IsValidPassword(userLogin.Password) {
-		h.r.Render(res, http.StatusUnauthorized, nil)
+		response.Render(res, http.StatusUnauthorized, nil, h.log)
 
 		return
 	}
 
 	if !user.IsActive() {
-		h.r.Error(res, http.StatusUnauthorized, "account not activated")
+		response.RenderErrorStatus(res, http.StatusUnauthorized, "account not activated", h.log)
 
 		return
 	}
@@ -184,12 +181,12 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 
 	if publicUser.AuthToken, publicUser.RefreshToken, err = h.jwt.Tokens(publicUser.ID, requestID); err != nil {
 		h.log.Warn("tokens", lax.Error(err))
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
 
-	h.r.Render(res, http.StatusOK, publicUser)
+	response.Render(res, http.StatusOK, publicUser, h.log)
 }
 
 // RequestPasswordReset requests password reset.
@@ -205,9 +202,9 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 // @Failure 500
 // @Summary Request password reset.
 func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.Request) {
-	email, publicErr := public.EmailFromJSON(req.Body, h.log)
-	if publicErr != nil {
-		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+	email, err := public.EmailFromJSON(req.Body, h.log)
+	if err != nil {
+		response.RenderError(res, err, h.log)
 
 		return
 	}
@@ -215,13 +212,13 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 	user, err := h.usersRepo.FetchPasswordResetToken(req.Context(), email.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
-			h.r.Error(res, http.StatusNotFound, err.Error())
+			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
 
 			return
 		}
 
 		h.log.Warn("password reset token", lax.Error(err))
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
@@ -231,12 +228,12 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 	if err = h.sender.Send(user.Email, "Password reset request", message); err != nil {
 		h.log.Warn("send password reset token", lax.Error(err))
 
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
 
-	h.r.Render(res, http.StatusAccepted, nil)
+	response.Render(res, http.StatusAccepted, nil, h.log)
 }
 
 // CheckPasswordStrength calculates password strength.
@@ -250,14 +247,14 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 // @Failure 400 {object} render.Error
 // @Summary Calculate password strength.
 func (h *UsersHandler) CheckPasswordStrength(res http.ResponseWriter, req *http.Request) {
-	password, publicErr := public.PasswordFromJSON(req.Body, h.log)
-	if publicErr != nil {
-		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+	password, err := public.PasswordFromJSON(req.Body, h.log)
+	if err != nil {
+		response.RenderError(res, err, h.log)
 
 		return
 	}
 
-	h.r.Render(res, http.StatusOK, password.Strength())
+	response.Render(res, http.StatusOK, password.Strength(), h.log)
 }
 
 // ResetPassword sets new user's password.
@@ -273,9 +270,9 @@ func (h *UsersHandler) CheckPasswordStrength(res http.ResponseWriter, req *http.
 // @Failure 500
 // @Summary Set new user's password.
 func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request) {
-	resetPassword, publicErr := public.ResetPasswordFromJSON(req.Body, h.log)
-	if publicErr != nil {
-		h.r.Error(res, publicErr.StatusCode, publicErr.Message)
+	resetPassword, err := public.ResetPasswordFromJSON(req.Body, h.log)
+	if err != nil {
+		response.RenderError(res, err, h.log)
 
 		return
 	}
@@ -283,13 +280,13 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 	user, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken, resetPassword.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
-			h.r.Error(res, http.StatusNotFound, err.Error())
+			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
 
 			return
 		}
 
 		h.log.Warn("reset password", lax.Error(err))
-		h.r.Render(res, http.StatusInternalServerError, nil)
+		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
@@ -297,7 +294,7 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 	publicUser := public.FromDomainUser(user)
 	publicUser.ID = ""
 
-	h.r.Render(res, http.StatusAccepted, publicUser)
+	response.Render(res, http.StatusAccepted, publicUser, h.log)
 }
 
 func (h *UsersHandler) RefreshToken(res http.ResponseWriter, req *http.Request) {
