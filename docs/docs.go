@@ -46,7 +46,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/public.UserRegistration"
+                            "$ref": "#/definitions/request.UserRegistration"
                         }
                     }
                 ],
@@ -54,19 +54,19 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/public.User"
+                            "$ref": "#/definitions/response.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "500": {
@@ -100,19 +100,19 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/public.User"
+                            "$ref": "#/definitions/response.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "500": {
@@ -140,7 +140,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/public.Password"
+                            "$ref": "#/definitions/request.Password"
                         }
                     }
                 ],
@@ -151,7 +151,7 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     }
                 }
@@ -176,7 +176,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/public.UserLogin"
+                            "$ref": "#/definitions/request.UserLogin"
                         }
                     }
                 ],
@@ -184,25 +184,25 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/public.User"
+                            "$ref": "#/definitions/response.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "500": {
@@ -230,7 +230,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/public.Email"
+                            "$ref": "#/definitions/request.Email"
                         }
                     }
                 ],
@@ -241,13 +241,13 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "500": {
@@ -273,7 +273,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/public.ResetPassword"
+                            "$ref": "#/definitions/request.ResetPassword"
                         }
                     }
                 ],
@@ -281,19 +281,19 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/public.User"
+                            "$ref": "#/definitions/response.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/render.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "500": {
@@ -304,7 +304,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "public.Email": {
+        "request.Email": {
             "type": "object",
             "properties": {
                 "email": {
@@ -312,7 +312,7 @@ var doc = `{
                 }
             }
         },
-        "public.Password": {
+        "request.Password": {
             "type": "object",
             "properties": {
                 "password": {
@@ -320,7 +320,7 @@ var doc = `{
                 }
             }
         },
-        "public.ResetPassword": {
+        "request.ResetPassword": {
             "type": "object",
             "properties": {
                 "password": {
@@ -331,7 +331,37 @@ var doc = `{
                 }
             }
         },
-        "public.User": {
+        "request.UserLogin": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UserRegistration": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Error": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.User": {
             "type": "object",
             "properties": {
                 "authToken": {
@@ -351,36 +381,6 @@ var doc = `{
                     "type": "string"
                 },
                 "updated": {
-                    "type": "string"
-                }
-            }
-        },
-        "public.UserLogin": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "public.UserRegistration": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "render.Error": {
-            "type": "object",
-            "properties": {
-                "error": {
                     "type": "string"
                 }
             }

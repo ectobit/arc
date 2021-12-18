@@ -1,22 +1,41 @@
 definitions:
-  public.Email:
+  request.Email:
     properties:
       email:
         type: string
     type: object
-  public.Password:
+  request.Password:
     properties:
       password:
         type: string
     type: object
-  public.ResetPassword:
+  request.ResetPassword:
     properties:
       password:
         type: string
       passwordResetToken:
         type: string
     type: object
-  public.User:
+  request.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  request.UserRegistration:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  response.Error:
+    properties:
+      error:
+        type: string
+    type: object
+  response.User:
     properties:
       authToken:
         type: string
@@ -30,25 +49,6 @@ definitions:
       refreshToken:
         type: string
       updated:
-        type: string
-    type: object
-  public.UserLogin:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  public.UserRegistration:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  render.Error:
-    properties:
-      error:
         type: string
     type: object
 info:
@@ -69,22 +69,22 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/public.UserRegistration'
+          $ref: '#/definitions/request.UserRegistration'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/public.User'
+            $ref: '#/definitions/response.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "500":
           description: ""
       summary: Register user account.
@@ -106,15 +106,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/public.User'
+            $ref: '#/definitions/response.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "500":
           description: ""
       summary: Activate user account.
@@ -130,7 +130,7 @@ paths:
         name: password
         required: true
         schema:
-          $ref: '#/definitions/public.Password'
+          $ref: '#/definitions/request.Password'
       produces:
       - application/json
       responses:
@@ -139,7 +139,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
       summary: Calculate password strength.
       tags:
       - users
@@ -153,26 +153,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/public.UserLogin'
+          $ref: '#/definitions/request.UserLogin'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/public.User'
+            $ref: '#/definitions/response.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "500":
           description: ""
       summary: Login.
@@ -188,22 +188,22 @@ paths:
         name: resetPassword
         required: true
         schema:
-          $ref: '#/definitions/public.ResetPassword'
+          $ref: '#/definitions/request.ResetPassword'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/public.User'
+            $ref: '#/definitions/response.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "500":
           description: ""
       summary: Set new user's password.
@@ -218,7 +218,7 @@ paths:
         name: email
         required: true
         schema:
-          $ref: '#/definitions/public.Email'
+          $ref: '#/definitions/request.Email'
       produces:
       - application/json
       responses:
@@ -227,11 +227,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/render.Error'
+            $ref: '#/definitions/response.Error'
         "500":
           description: ""
       summary: Request password reset.

@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"go.ectobit.com/arc/handler/public"
+	"github.com/nbutton23/zxcvbn-go"
 	"go.ectobit.com/arc/handler/request"
 	"go.ectobit.com/arc/handler/response"
 	"go.ectobit.com/arc/handler/token"
@@ -45,21 +45,21 @@ func NewUsersHandler(ur repository.Users, jwt *token.JWT, sender send.Sender, ex
 // @Accept json
 // @Produce json
 // @Router /users [post]
-// @Param user body public.UserRegistration true "User"
-// @Success 201 {object} public.User
-// @Failure 400 {object} render.Error
-// @Failure 409 {object} render.Error
+// @Param user body request.UserRegistration true "User"
+// @Success 201 {object} response.User
+// @Failure 400 {object} response.Error
+// @Failure 409 {object} response.Error
 // @Failure 500
 // @Summary Register user account.
 func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
-	userRegistration, err := public.UserRegistrationFromJSON(req.Body, h.log)
+	userRegistration, err := request.UserRegistrationFromJSON(req.Body, h.log)
 	if err != nil {
 		response.RenderError(res, err, h.log)
 
 		return
 	}
 
-	user, err := h.usersRepo.Create(req.Context(), userRegistration.Email, userRegistration.HashedPassword)
+	domainUser, err := h.usersRepo.Create(req.Context(), userRegistration.Email, userRegistration.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrUniqueViolation) {
 			response.RenderErrorStatus(res, http.StatusConflict, "already registered", h.log)
@@ -73,9 +73,9 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	message := fmt.Sprintf("%s/users/activate/%s", h.externalURL, user.ActivationToken)
+	message := fmt.Sprintf("%s/users/activate/%s", h.externalURL, domainUser.ActivationToken)
 
-	if err = h.sender.Send(user.Email, "Account activation", message); err != nil {
+	if err = h.sender.Send(domainUser.Email, "Account activation", message); err != nil {
 		h.log.Warn("send activation link", lax.Error(err))
 
 		response.Render(res, http.StatusInternalServerError, nil, h.log)
@@ -83,10 +83,10 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	publicUser := public.FromDomainUser(user)
-	publicUser.ID = ""
+	user := response.FromDomainUser(domainUser)
+	user.ID = ""
 
-	response.Render(res, http.StatusCreated, publicUser, h.log)
+	response.Render(res, http.StatusCreated, user, h.log)
 }
 
 // Activate activates user account.
@@ -96,9 +96,9 @@ func (h *UsersHandler) Register(res http.ResponseWriter, req *http.Request) {
 // @Produce json
 // @Router /users/activate/{token} [get]
 // @Param token path string true "Activation token"
-// @Success 200 {object} public.User
-// @Failure 400 {object} render.Error
-// @Failure 404 {object} render.Error
+// @Success 200 {object} response.User
+// @Failure 400 {object} response.Error
+// @Failure 404 {object} response.Error
 // @Failure 500
 // @Summary Activate user account.
 func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
@@ -109,7 +109,7 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := h.usersRepo.Activate(req.Context(), token)
+	domainUser, err := h.usersRepo.Activate(req.Context(), token)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
@@ -123,10 +123,10 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	publicUser := public.FromDomainUser(user)
-	publicUser.ID = ""
+	user := response.FromDomainUser(domainUser)
+	user.ID = ""
 
-	response.Render(res, http.StatusOK, publicUser, h.log)
+	response.Render(res, http.StatusOK, user, h.log)
 }
 
 // Login logins user.
@@ -135,22 +135,22 @@ func (h *UsersHandler) Activate(res http.ResponseWriter, req *http.Request) {
 // @Accept json
 // @Produce json
 // @Router /users/login [post]
-// @Param user body public.UserLogin true "User"
-// @Success 201 {object} public.User
-// @Failure 400 {object} render.Error
-// @Failure 401 {object} render.Error
-// @Failure 404 {object} render.Error
+// @Param user body request.UserLogin true "User"
+// @Success 201 {object} response.User
+// @Failure 400 {object} response.Error
+// @Failure 401 {object} response.Error
+// @Failure 404 {object} response.Error
 // @Failure 500
 // @Summary Login.
 func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
-	userLogin, err := public.UserLoginFromJSON(req.Body, h.log)
+	userLogin, err := request.UserLoginFromJSON(req.Body, h.log)
 	if err != nil {
 		response.RenderError(res, err, h.log)
 
 		return
 	}
 
-	user, err := h.usersRepo.FindOneByEmail(req.Context(), userLogin.Email)
+	domainUser, err := h.usersRepo.FindOneByEmail(req.Context(), userLogin.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
@@ -164,29 +164,29 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !user.IsValidPassword(userLogin.Password) {
+	if !domainUser.IsValidPassword(userLogin.Password) {
 		response.Render(res, http.StatusUnauthorized, nil, h.log)
 
 		return
 	}
 
-	if !user.IsActive() {
+	if !domainUser.IsActive() {
 		response.RenderErrorStatus(res, http.StatusUnauthorized, "account not activated", h.log)
 
 		return
 	}
 
-	publicUser := public.FromDomainUser(user)
+	user := response.FromDomainUser(domainUser)
 	requestID := middleware.GetReqID(req.Context())
 
-	if publicUser.AuthToken, publicUser.RefreshToken, err = h.jwt.Tokens(publicUser.ID, requestID); err != nil {
+	if user.AuthToken, user.RefreshToken, err = h.jwt.Tokens(user.ID, requestID); err != nil {
 		h.log.Warn("tokens", lax.Error(err))
 		response.Render(res, http.StatusInternalServerError, nil, h.log)
 
 		return
 	}
 
-	response.Render(res, http.StatusOK, publicUser, h.log)
+	response.Render(res, http.StatusOK, user, h.log)
 }
 
 // RequestPasswordReset requests password reset.
@@ -195,14 +195,14 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 // @Accept json
 // @Produce json
 // @Router /users/reset-password [post]
-// @Param email body public.Email true "E-mail address"
+// @Param email body request.Email true "E-mail address"
 // @Success 202
-// @Failure 400 {object} render.Error
-// @Failure 404 {object} render.Error
+// @Failure 400 {object} response.Error
+// @Failure 404 {object} response.Error
 // @Failure 500
 // @Summary Request password reset.
 func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.Request) {
-	email, err := public.EmailFromJSON(req.Body, h.log)
+	email, err := request.EmailFromJSON(req.Body, h.log)
 	if err != nil {
 		response.RenderError(res, err, h.log)
 
@@ -242,19 +242,21 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 // @Accept json
 // @Produce json
 // @Router /users/check-password [post]
-// @Param password body public.Password true "Password"
+// @Param password body request.Password true "Password"
 // @Success 200
-// @Failure 400 {object} render.Error
+// @Failure 400 {object} response.Error
 // @Summary Calculate password strength.
 func (h *UsersHandler) CheckPasswordStrength(res http.ResponseWriter, req *http.Request) {
-	password, err := public.PasswordFromJSON(req.Body, h.log)
+	password, err := request.PasswordFromJSON(req.Body, h.log)
 	if err != nil {
 		response.RenderError(res, err, h.log)
 
 		return
 	}
 
-	response.Render(res, http.StatusOK, password.Strength(), h.log)
+	response.Render(res, http.StatusOK, &response.PasswordStrength{
+		Strength: uint8(zxcvbn.PasswordStrength(password.Password, nil).Score),
+	}, h.log)
 }
 
 // ResetPassword sets new user's password.
@@ -263,21 +265,21 @@ func (h *UsersHandler) CheckPasswordStrength(res http.ResponseWriter, req *http.
 // @Accept json
 // @Produce json
 // @Router /users/reset-password [patch]
-// @Param resetPassword body public.ResetPassword true "Password reset token and new password"
-// @Success 200 {object} public.User
-// @Failure 400 {object} render.Error
-// @Failure 404 {object} render.Error
+// @Param resetPassword body request.ResetPassword true "Password reset token and new password"
+// @Success 200 {object} response.User
+// @Failure 400 {object} response.Error
+// @Failure 404 {object} response.Error
 // @Failure 500
 // @Summary Set new user's password.
 func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request) {
-	resetPassword, err := public.ResetPasswordFromJSON(req.Body, h.log)
+	resetPassword, err := request.ResetPasswordFromJSON(req.Body, h.log)
 	if err != nil {
 		response.RenderError(res, err, h.log)
 
 		return
 	}
 
-	user, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken, resetPassword.HashedPassword)
+	domainUser, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken, resetPassword.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
@@ -291,10 +293,10 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	publicUser := public.FromDomainUser(user)
-	publicUser.ID = ""
+	user := response.FromDomainUser(domainUser)
+	user.ID = ""
 
-	response.Render(res, http.StatusAccepted, publicUser, h.log)
+	response.Render(res, http.StatusAccepted, user, h.log)
 }
 
 func (h *UsersHandler) RefreshToken(res http.ResponseWriter, req *http.Request) {
