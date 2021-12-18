@@ -310,9 +310,7 @@ func TestStrength(t *testing.T) {
 
 	p := &public.Password{Password: "test"}
 
-	got := p.Strength().Strength
-
-	if got != 0 {
+	if got := p.Strength().Strength; got != 0 {
 		t.Errorf(`Strength("test") = %d; want 0`, got)
 	}
 }
