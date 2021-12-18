@@ -45,11 +45,11 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 			got, gotErr := public.UserRegistrationFromJSON(buf, log)
 			if test.wantErr != "" {
 				if gotErr == nil {
-					t.Fatalf("UserRegistrationFromJSON(%q) = error nil; want %q", test.in, test.wantErr)
+					t.Fatalf("UserRegistrationFromJSON(%q) = error nil; want error %q", test.in, test.wantErr)
 				}
 
 				if gotErr.Error() != test.wantErr {
-					t.Fatalf("UserRegistrationFromJSON(%q) = error %q; want %q", test.in, test.wantErr, gotErr)
+					t.Fatalf("UserRegistrationFromJSON(%q) = error %q; want error %q", test.in, test.wantErr, gotErr)
 				}
 
 				return
@@ -103,11 +103,11 @@ func TestUserLoginFromJSON(t *testing.T) {
 			got, gotErr := public.UserLoginFromJSON(buf, log)
 			if test.wantErr != "" {
 				if gotErr == nil {
-					t.Fatalf("UserLoginFromJSON(%q) = error nil; want %q", test.in, test.wantErr)
+					t.Fatalf("UserLoginFromJSON(%q) = error nil; want error %q", test.in, test.wantErr)
 				}
 
 				if gotErr.Error() != test.wantErr {
-					t.Fatalf("UserLoginFromJSON(%q) = error %q; want %q", test.in, gotErr, test.wantErr)
+					t.Fatalf("UserLoginFromJSON(%q) = error %q; want error %q", test.in, gotErr, test.wantErr)
 				}
 
 				return
@@ -115,6 +115,54 @@ func TestUserLoginFromJSON(t *testing.T) {
 
 			if got.Email != test.want.Email || got.Password != test.want.Password {
 				t.Errorf("UserLoginFromJSON(%q) = %v; want %v", test.in, got, test.want)
+			}
+		})
+	}
+}
+
+func TestEmailFromJSON(t *testing.T) {
+	t.Parallel()
+
+	log := lax.NewZapAdapter(zaptest.NewLogger(t))
+
+	tests := map[string]struct {
+		in      string
+		want    *public.Email
+		wantErr string
+	}{
+		"invalid json body": {``, nil, "invalid json body"},
+		"empty body":        {`{}`, nil, "empty email"},
+		"all empty":         {`{"email":""}`, nil, "empty email"},
+		"invalid email":     {`{"email":"a"}`, nil, "invalid email"},
+		"ok": {
+			`{"email":"john.doe@sixpack.com"}`,
+			&public.Email{Email: "john.doe@sixpack.com"}, "",
+		},
+	}
+
+	for n, test := range tests { //nolint:paralleltest
+		test := test
+
+		t.Run(n, func(t *testing.T) {
+			t.Parallel()
+
+			buf := bytes.NewBufferString(test.in)
+
+			got, gotErr := public.EmailFromJSON(buf, log)
+			if test.wantErr != "" {
+				if gotErr == nil {
+					t.Fatalf("EmailFromJSON(%q) = error nil; want error %q", test.in, test.wantErr)
+				}
+
+				if gotErr.Error() != test.wantErr {
+					t.Fatalf("EmailFromJSON(%q) = error %q; want error %q", test.in, gotErr, test.wantErr)
+				}
+
+				return
+			}
+
+			if got.Email != test.want.Email {
+				t.Errorf("EmailFromJSON(%q) = %v; want %v", test.in, got, test.want)
 			}
 		})
 	}
