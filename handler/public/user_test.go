@@ -2,10 +2,10 @@ package public_test
 
 import (
 	"bytes"
-	"reflect"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/handler/public"
 	"go.ectobit.com/lax"
@@ -45,18 +45,18 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 			got, gotErr := public.UserRegistrationFromJSON(buf, log)
 			if test.wantErr != "" {
 				if gotErr == nil {
-					t.Fatalf("want error %q, got no error", test.wantErr)
+					t.Fatalf("UserRegistrationFromJSON(%q) = error nil; want %q", test.in, test.wantErr)
 				}
 
 				if gotErr.Error() != test.wantErr {
-					t.Fatalf("want error %q, got error %q", test.wantErr, gotErr)
+					t.Fatalf("UserRegistrationFromJSON(%q) = error %q; want %q", test.in, test.wantErr, gotErr)
 				}
 
 				return
 			}
 
 			if got.Email != test.want.Email || got.Password != test.want.Password {
-				t.Errorf("\nwant %v,\n got %v", test.want, got)
+				t.Errorf("UserRegistrationFromJSON(%q) = %v; want %v", test.in, got, test.want)
 			}
 
 			domainUser := &domain.User{ //nolint:exhaustivestruct
@@ -65,7 +65,7 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 			}
 
 			if !domainUser.IsValidPassword(test.want.Password) {
-				t.Errorf("invalid password")
+				t.Errorf("IsValidPassword(%q) = true; got false", test.want.Password)
 			}
 		})
 	}
@@ -103,18 +103,18 @@ func TestUserLoginFromJSON(t *testing.T) {
 			got, gotErr := public.UserLoginFromJSON(buf, log)
 			if test.wantErr != "" {
 				if gotErr == nil {
-					t.Fatalf("want error %q, got no error", test.wantErr)
+					t.Fatalf("UserLoginFromJSON(%q) = error nil; want %q", test.in, test.wantErr)
 				}
 
 				if gotErr.Error() != test.wantErr {
-					t.Fatalf("want error %q, got error %q", test.wantErr, gotErr)
+					t.Fatalf("UserLoginFromJSON(%q) = error %q; want %q", test.in, gotErr, test.wantErr)
 				}
 
 				return
 			}
 
 			if got.Email != test.want.Email || got.Password != test.want.Password {
-				t.Errorf("\nwant %v,\ngot  %v", test.want, got)
+				t.Errorf("UserLoginFromJSON(%q) = %v; want %v", test.in, got, test.want)
 			}
 		})
 	}
@@ -147,7 +147,8 @@ func TestFromDomainUser(t *testing.T) {
 	}
 
 	gotPublicUser := public.FromDomainUser(domainUser)
-	if !reflect.DeepEqual(gotPublicUser, wantPublicUser) {
-		t.Errorf("\nwant %v,\ngot  %v", wantPublicUser, gotPublicUser)
+
+	if diff := cmp.Diff(wantPublicUser, gotPublicUser); diff != "" {
+		t.Errorf("FromDomainUser() mismatch (-want +got):\n%s", diff)
 	}
 }

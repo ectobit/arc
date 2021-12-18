@@ -19,12 +19,12 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
-func TestRegister(t *testing.T) {
+func TestRegister(t *testing.T) { //nolint:funlen
 	t.Parallel()
 
 	jwt, err := token.NewJWT("test", "test", time.Hour, time.Hour)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	log := lax.NewZapAdapter(zaptest.NewLogger(t))
@@ -58,27 +58,27 @@ func TestRegister(t *testing.T) {
 
 			gotRes, gotErr := http.DefaultClient.Post(server.URL, "application/json", buf) //nolint:noctx
 			if gotErr != nil {
-				t.Error(gotErr)
+				t.Fatal(gotErr)
 			}
 
 			defer func() {
 				err := gotRes.Body.Close()
 				if err != nil {
-					t.Error(err)
+					t.Fatal(err)
 				}
 			}()
 
 			if gotRes.StatusCode != test.wantStatus {
-				t.Errorf("want status %d, got status %d", test.wantStatus, gotRes.StatusCode)
+				t.Fatalf("Post() = status %d; want status %d", gotRes.StatusCode, test.wantStatus)
 			}
 
 			gotBody, gotErr := io.ReadAll(gotRes.Body)
 			if gotErr != nil {
-				t.Error(gotErr)
+				t.Fatal(gotErr)
 			}
 
 			if test.wantBody != "" && string(gotBody) != test.wantBody {
-				t.Errorf("want %s, got %s", test.wantBody, string(gotBody))
+				t.Errorf("ReadAll() = %q; want %q", string(gotBody), test.wantBody)
 			}
 		})
 	}

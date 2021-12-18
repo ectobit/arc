@@ -11,7 +11,7 @@ func TestIsValidPassword(t *testing.T) {
 
 	password, err := domain.HashPassword("test")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	user := domain.User{ //nolint:exhaustivestruct
@@ -19,6 +19,6 @@ func TestIsValidPassword(t *testing.T) {
 	}
 
 	if !user.IsValidPassword("test") {
-		t.Error("password should be valid")
+		t.Errorf(`IsValidPassword("test") = false; want true`)
 	}
 }
