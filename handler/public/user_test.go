@@ -304,3 +304,15 @@ func TestFromDomainUser(t *testing.T) {
 		t.Errorf("FromDomainUser() mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestStrength(t *testing.T) {
+	t.Parallel()
+
+	p := &public.Password{Password: "test"}
+
+	got := p.Strength().Strength
+
+	if got != 0 {
+		t.Errorf(`Strength("test") = %d; want 0`, got)
+	}
+}
