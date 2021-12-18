@@ -7,8 +7,9 @@ import (
 	"go.ectobit.com/lax"
 )
 
+// RefreshToken request body.
 type RefreshToken struct {
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 // RefreshTokenFromBody parses RefreshToken from request body.

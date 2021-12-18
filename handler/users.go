@@ -279,7 +279,8 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	domainUser, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken, resetPassword.HashedPassword)
+	domainUser, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken,
+		resetPassword.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
@@ -299,6 +300,7 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 	response.Render(res, http.StatusAccepted, user, h.log)
 }
 
+// RefreshToken refreshes JWT authentication token.
 func (h *UsersHandler) RefreshToken(res http.ResponseWriter, req *http.Request) {
 	refreshToken, err := request.RefreshTokenFromBody(req.Body, h.log)
 	if err != nil {
@@ -308,4 +310,6 @@ func (h *UsersHandler) RefreshToken(res http.ResponseWriter, req *http.Request) 
 	}
 
 	_ = refreshToken
+
+	panic("unimplemented")
 }

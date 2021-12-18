@@ -1,3 +1,4 @@
+// Package request contains request data structures and related functions.
 package request
 
 import (

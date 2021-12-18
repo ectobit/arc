@@ -1,3 +1,4 @@
+// Package response contains response data structures and related functions.
 package response
 
 import (
@@ -9,11 +10,12 @@ import (
 	"go.ectobit.com/lax"
 )
 
-// Error is used to render JSON error.
+// Error response body.
 type Error struct {
 	Error string `json:"error"`
 }
 
+// RenderError renders response with error by provided error.
 func RenderError(res http.ResponseWriter, err error, log lax.Logger) {
 	reqErr := &request.Error{} //nolint:exhaustivestruct
 
@@ -26,11 +28,12 @@ func RenderError(res http.ResponseWriter, err error, log lax.Logger) {
 	Render(res, http.StatusInternalServerError, nil, log)
 }
 
+// RenderErrorStatus renders response with error by provided status code and error message.
 func RenderErrorStatus(res http.ResponseWriter, statusCode int, message string, log lax.Logger) {
 	Render(res, statusCode, &Error{Error: message}, log)
 }
 
-// Render renders HTTP response with JSON body.
+// Render renders response with data.
 func Render(res http.ResponseWriter, statusCode int, body interface{}, log lax.Logger) {
 	res.Header().Set("Content-Type", "application/json")
 
