@@ -9,6 +9,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"go.ectobit.com/arc/handler/public"
 	"go.ectobit.com/arc/handler/render"
+	"go.ectobit.com/arc/handler/request"
+	"go.ectobit.com/arc/handler/response"
 	"go.ectobit.com/arc/handler/token"
 	"go.ectobit.com/arc/repository"
 	"go.ectobit.com/arc/send"
@@ -296,4 +298,15 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 	publicUser.ID = ""
 
 	h.r.Render(res, http.StatusAccepted, publicUser)
+}
+
+func (h *UsersHandler) RefreshToken(res http.ResponseWriter, req *http.Request) {
+	refreshToken, err := request.RefreshTokenFromBody(req.Body, h.log)
+	if err != nil {
+		response.RenderError(res, err, h.log)
+
+		return
+	}
+
+	_ = refreshToken
 }

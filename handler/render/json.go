@@ -22,6 +22,7 @@ func NewJSON(log lax.Logger) *JSON {
 }
 
 // Render renders HTTP response with JSON body.
+// Deprecated.
 func (r *JSON) Render(res http.ResponseWriter, statusCode int, body interface{}) {
 	res.Header().Set("Content-Type", "application/json")
 

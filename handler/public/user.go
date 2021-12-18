@@ -9,6 +9,7 @@ import (
 
 	"github.com/nbutton23/zxcvbn-go"
 	"go.ectobit.com/arc/domain"
+	"go.ectobit.com/arc/handler/request"
 	"go.ectobit.com/lax"
 )
 
@@ -44,7 +45,7 @@ type UserRegistration struct {
 }
 
 // UserRegistrationFromJSON parses user registration data from request body.
-func UserRegistrationFromJSON(body io.Reader, log lax.Logger) (*UserRegistration, *Error) {
+func UserRegistrationFromJSON(body io.Reader, log lax.Logger) (*UserRegistration, *request.Error) {
 	var u UserRegistration
 
 	var err error
@@ -52,30 +53,30 @@ func UserRegistrationFromJSON(body io.Reader, log lax.Logger) (*UserRegistration
 	if err := json.NewDecoder(body).Decode(&u); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
-		return nil, NewBadRequestError("invalid json body")
+		return nil, request.NewBadRequestError("invalid json body")
 	}
 
 	if u.Email == "" {
-		return nil, NewBadRequestError("empty email")
+		return nil, request.NewBadRequestError("empty email")
 	}
 
 	if !isValidEmail(u.Email) {
-		return nil, NewBadRequestError("invalid email")
+		return nil, request.NewBadRequestError("invalid email")
 	}
 
 	if u.Password == "" {
-		return nil, NewBadRequestError("empty password")
+		return nil, request.NewBadRequestError("empty password")
 	}
 
 	if isWeakPassword(u.Password) {
-		return nil, NewBadRequestError("weak password")
+		return nil, request.NewBadRequestError("weak password")
 	}
 
 	u.HashedPassword, err = domain.HashPassword(u.Password)
 	if err != nil {
 		log.Warn("hash password", lax.Error(err))
 
-		return nil, ErrorFromStatusCode(http.StatusInternalServerError)
+		return nil, request.ErrorFromStatusCode(http.StatusInternalServerError)
 	}
 
 	return &u, nil
@@ -88,25 +89,25 @@ type UserLogin struct {
 }
 
 // UserLoginFromJSON parses user login data from request body.
-func UserLoginFromJSON(body io.Reader, log lax.Logger) (*UserLogin, *Error) {
+func UserLoginFromJSON(body io.Reader, log lax.Logger) (*UserLogin, *request.Error) {
 	var u UserLogin
 
 	if err := json.NewDecoder(body).Decode(&u); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
-		return nil, NewBadRequestError("invalid json body")
+		return nil, request.NewBadRequestError("invalid json body")
 	}
 
 	if u.Email == "" {
-		return nil, NewBadRequestError("empty email")
+		return nil, request.NewBadRequestError("empty email")
 	}
 
 	if !isValidEmail(u.Email) {
-		return nil, NewBadRequestError("invalid email")
+		return nil, request.NewBadRequestError("invalid email")
 	}
 
 	if u.Password == "" {
-		return nil, NewBadRequestError("empty password")
+		return nil, request.NewBadRequestError("empty password")
 	}
 
 	return &u, nil
@@ -118,21 +119,21 @@ type Email struct {
 }
 
 // EmailFromJSON parses email from request body.
-func EmailFromJSON(body io.Reader, log lax.Logger) (*Email, *Error) {
+func EmailFromJSON(body io.Reader, log lax.Logger) (*Email, *request.Error) {
 	var rpr Email
 
 	if err := json.NewDecoder(body).Decode(&rpr); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
-		return nil, NewBadRequestError("invalid json body")
+		return nil, request.NewBadRequestError("invalid json body")
 	}
 
 	if rpr.Email == "" {
-		return nil, NewBadRequestError("empty email")
+		return nil, request.NewBadRequestError("empty email")
 	}
 
 	if !isValidEmail(rpr.Email) {
-		return nil, NewBadRequestError("invalid email")
+		return nil, request.NewBadRequestError("invalid email")
 	}
 
 	return &rpr, nil
@@ -144,17 +145,17 @@ type Password struct {
 }
 
 // PasswordFromJSON parses password from request body.
-func PasswordFromJSON(body io.Reader, log lax.Logger) (*Password, *Error) {
+func PasswordFromJSON(body io.Reader, log lax.Logger) (*Password, *request.Error) {
 	var cps Password
 
 	if err := json.NewDecoder(body).Decode(&cps); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
-		return nil, NewBadRequestError("invalid json body")
+		return nil, request.NewBadRequestError("invalid json body")
 	}
 
 	if cps.Password == "" {
-		return nil, NewBadRequestError("empty password")
+		return nil, request.NewBadRequestError("empty password")
 	}
 
 	return &cps, nil
@@ -186,7 +187,7 @@ type ResetPassword struct {
 }
 
 // ResetPasswordFromJSON parses ResetPassword from request body.
-func ResetPasswordFromJSON(body io.Reader, log lax.Logger) (*ResetPassword, *Error) {
+func ResetPasswordFromJSON(body io.Reader, log lax.Logger) (*ResetPassword, *request.Error) {
 	var rp ResetPassword
 
 	var err error
@@ -194,26 +195,26 @@ func ResetPasswordFromJSON(body io.Reader, log lax.Logger) (*ResetPassword, *Err
 	if err := json.NewDecoder(body).Decode(&rp); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
-		return nil, NewBadRequestError("invalid json body")
+		return nil, request.NewBadRequestError("invalid json body")
 	}
 
 	if rp.PasswordResetToken == "" {
-		return nil, NewBadRequestError("empty password reset token")
+		return nil, request.NewBadRequestError("empty password reset token")
 	}
 
 	if rp.Password == "" {
-		return nil, NewBadRequestError("empty password")
+		return nil, request.NewBadRequestError("empty password")
 	}
 
 	if isWeakPassword(rp.Password) {
-		return nil, NewBadRequestError("weak password")
+		return nil, request.NewBadRequestError("weak password")
 	}
 
 	rp.HashedPassword, err = domain.HashPassword(rp.Password)
 	if err != nil {
 		log.Warn("hash password", lax.Error(err))
 
-		return nil, ErrorFromStatusCode(http.StatusInternalServerError)
+		return nil, request.ErrorFromStatusCode(http.StatusInternalServerError)
 	}
 
 	return &rp, nil

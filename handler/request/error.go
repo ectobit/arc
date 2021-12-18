@@ -1,4 +1,4 @@
-package public
+package request
 
 import (
 	"net/http"
@@ -12,12 +12,12 @@ type Error struct {
 }
 
 // NewError creates error.
-func NewError(statusCode int, message string) *Error {
-	return &Error{
-		StatusCode: statusCode,
-		Message:    message,
-	}
-}
+// func NewError(statusCode int, message string) *Error {
+// 	return &Error{
+// 		StatusCode: statusCode,
+// 		Message:    message,
+// 	}
+// }
 
 // NewBadRequestError creates error with status bad request.
 func NewBadRequestError(message string) *Error {
@@ -28,14 +28,14 @@ func NewBadRequestError(message string) *Error {
 }
 
 // NewInternalServerError creates error with status internal server error.
-func NewInternalServerError(message string) *Error {
-	return &Error{
-		StatusCode: http.StatusInternalServerError,
-		Message:    message,
-	}
-}
+// func NewInternalServerError(message string) *Error {
+// 	return &Error{
+// 		StatusCode: http.StatusInternalServerError,
+// 		Message:    message,
+// 	}
+// }
 
-// ErrorFromStatusCode creates error with message from status code.
+// ErrorFromStatusCode creates error with message from status code. Deprecated.
 func ErrorFromStatusCode(statusCode int) *Error {
 	return &Error{
 		StatusCode: statusCode,
