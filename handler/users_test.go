@@ -92,7 +92,11 @@ func (repo *usersRepositoryFake) Create(ctx context.Context, email string, passw
 	return &domain.User{}, nil //nolint:exhaustivestruct
 }
 
-func (repo *usersRepositoryFake) FetchByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (repo *usersRepositoryFake) FindOne(ctx context.Context, id string) (*domain.User, error) {
+	panic("unimplemented")
+}
+
+func (repo *usersRepositoryFake) FindOneByEmail(ctx context.Context, email string) (*domain.User, error) {
 	panic("unimplemented")
 }
 

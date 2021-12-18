@@ -151,7 +151,7 @@ func (h *UsersHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := h.usersRepo.FetchByEmail(req.Context(), userLogin.Email)
+	user, err := h.usersRepo.FindOneByEmail(req.Context(), userLogin.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			h.r.Error(res, http.StatusNotFound, err.Error())

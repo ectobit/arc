@@ -13,8 +13,10 @@ var regex = regexp.MustCompile(`\s+`)
 type Users interface {
 	// Create creates new user in users repository.
 	Create(ctx context.Context, email string, password []byte) (*domain.User, error)
-	// FetchByEmail fetches user from users repository using email address.
-	FetchByEmail(ctx context.Context, email string) (*domain.User, error)
+	// FindOne fetches user from users repository using ID.
+	FindOne(ctx context.Context, email string) (*domain.User, error)
+	// FindOneByEmail fetches user from users repository using email address.
+	FindOneByEmail(ctx context.Context, email string) (*domain.User, error)
 	// Activate activates user account in users repository.
 	Activate(ctx context.Context, token string) (*domain.User, error)
 	// FetchPasswordResetToken sets user's password reset token in users repository.

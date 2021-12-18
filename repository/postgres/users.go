@@ -43,8 +43,30 @@ func (repo *UsersRepository) Create(ctx context.Context, email string, password 
 	return domainUser, nil
 }
 
-// FetchByEmail fetches user from PostgreSQL database using email address.
-func (repo *UsersRepository) FetchByEmail(ctx context.Context, email string) (*domain.User, error) {
+// FindOne fetches user from PostgreSQL database using ID.
+func (repo *UsersRepository) FindOne(ctx context.Context, id string) (*domain.User, error) {
+	query := `SELECT id, email, password, created, updated, activation_token, password_reset_token, active
+FROM users WHERE id=$1`
+
+	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), id)
+
+	var user User
+
+	if err := row.Scan(&user.ID, &user.Email, &user.Password, &user.Created, &user.Updated,
+		&user.ActivationToken, &user.PasswordResetToken, &user.Active); err != nil {
+		return nil, repositoryError("find one", err)
+	}
+
+	domainUser, err := user.DomainUser()
+	if err != nil {
+		return nil, fmt.Errorf("convert to domain user: %w", err)
+	}
+
+	return domainUser, nil
+}
+
+// FindOneByEmail fetches user from PostgreSQL database using email address.
+func (repo *UsersRepository) FindOneByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := `SELECT id, email, password, created, updated, activation_token, password_reset_token, active
 FROM users WHERE email=$1`
 
