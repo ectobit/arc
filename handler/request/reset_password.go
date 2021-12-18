@@ -3,7 +3,6 @@ package request
 import (
 	"encoding/json"
 	"io"
-	"net/http"
 
 	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/lax"
@@ -44,7 +43,7 @@ func ResetPasswordFromJSON(body io.Reader, log lax.Logger) (*ResetPassword, erro
 	if err != nil {
 		log.Warn("hash password", lax.Error(err))
 
-		return nil, ErrorFromStatusCode(http.StatusInternalServerError)
+		return nil, NewInternalServerError()
 	}
 
 	return &rp, nil
