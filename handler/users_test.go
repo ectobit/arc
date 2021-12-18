@@ -3,18 +3,17 @@ package handler_test
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 
+	"go.ectobit.com/arc/domain"
 	"go.ectobit.com/arc/handler"
 	"go.ectobit.com/arc/handler/render"
 	"go.ectobit.com/arc/handler/token"
-	"go.ectobit.com/arc/repository/postgres"
+	"go.ectobit.com/arc/repository"
 	"go.ectobit.com/arc/send"
 	"go.ectobit.com/lax"
 	"go.uber.org/zap/zaptest"
@@ -23,12 +22,15 @@ import (
 func TestRegister(t *testing.T) {
 	t.Parallel()
 
-	if testing.Short() {
-		t.Skip()
+	jwt, err := token.NewJWT("test", "test", time.Hour, time.Hour)
+	if err != nil {
+		t.Error(err)
 	}
 
-	usersHandler := setup(t)
+	log := lax.NewZapAdapter(zaptest.NewLogger(t))
+	usersHandler := handler.NewUsersHandler(render.NewJSON(log), &usersRepositoryFake{}, jwt, &send.Fake{}, "", "", log)
 	server := httptest.NewServer(http.HandlerFunc(usersHandler.Register))
+
 	tests := map[string]struct {
 		in         string
 		wantStatus int
@@ -82,38 +84,27 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func setup(t *testing.T) *handler.UsersHandler {
-	t.Helper()
+var _ repository.Users = (*usersRepositoryFake)(nil)
 
-	databaseName := os.Getenv("ARC_DB_HOST")
-	if databaseName == "" {
-		t.Fatal("environment variable ARC_DB_HOST not set")
-	}
+type usersRepositoryFake struct{}
 
-	ctx := context.TODO()
+func (repo *usersRepositoryFake) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
+	return &domain.User{}, nil
+}
 
-	log := lax.NewZapAdapter(zaptest.NewLogger(t))
+func (repo *usersRepositoryFake) FetchByEmail(ctx context.Context, email string) (*domain.User, error) {
+	panic("unimplemented")
+}
 
-	render := render.NewJSON(log)
+func (repo *usersRepositoryFake) Activate(ctx context.Context, token string) (*domain.User, error) {
+	panic("unimplemented")
+}
 
-	conn, err := postgres.Connect(ctx, fmt.Sprintf("postgres://postgres:arc@%s/test?sslmode=disable", databaseName),
-		log, "debug")
-	if err != nil {
-		t.Fatal(err)
-	}
+func (repo *usersRepositoryFake) FetchPasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
+	panic("unimplemented")
+}
 
-	t.Cleanup(conn.Close)
-
-	if _, err := conn.Exec(context.TODO(), "TRUNCATE users"); err != nil {
-		t.Error(err)
-	}
-
-	usersRepository := postgres.NewUserRepository(conn)
-
-	jwt, err := token.NewJWT("test", "test", time.Hour, time.Hour)
-	if err != nil {
-		t.Error(err)
-	}
-
-	return handler.NewUsersHandler(render, usersRepository, jwt, &send.Fake{}, "", "", log)
+func (repo *usersRepositoryFake) ResetPassword(ctx context.Context, passwordResetToken string,
+	password []byte) (*domain.User, error) {
+	panic("unimplemented")
 }

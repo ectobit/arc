@@ -1,4 +1,4 @@
-.PHONY: gen-swagger lint start stop test test-all test-cov
+.PHONY: gen-swagger lint start stop test test-cov
 
 gen-swagger:
 	@swag init
@@ -17,14 +17,8 @@ stop:
 	@docker-compose down
 
 test:
-	@go test -race -short ./...
-
-test-all:
-	PGPASSWORD=arc psql -U postgres -h localhost -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-	migrate -path=migrations -database='postgres://postgres:arc@localhost/test?sslmode=disable&query' up
-	ARC_DB_HOST=localhost go test -race ./...
+	@go test -race ./...
 
 test-cov:
-	PGPASSWORD=arc psql -U postgres -h localhost -d test -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-	ARC_DB_HOST=localhost go test -coverprofile=coverage.out ./...
+	@go test -coverprofile=coverage.out ./...
 	@go tool cover -func coverage.out
