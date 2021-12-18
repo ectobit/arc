@@ -113,7 +113,7 @@ func main() { //nolint:funlen
 	mux.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(jwt.JWTAuth()))
 		r.Use(jwtauth.Authenticator)
-		r.Use(mw.Authorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
+		r.Use(mw.Authorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv"), log))
 	})
 
 	server := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: mux} //nolint:exhaustivestruct
