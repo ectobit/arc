@@ -24,7 +24,6 @@ func Authorizer(enforcer *casbin.Enforcer, log lax.Logger) func(next http.Handle
 				http.Error(res, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 
 				return
-
 			}
 
 			if !enforcer.Enforce(user, req.URL.Path, req.Method) {
@@ -46,7 +45,7 @@ func SubjectFromJWT(ctx context.Context) (string, error) {
 	}
 
 	sub, ok := claims["sub"]
-	if !ok {
+	if !ok { //nolint:varnamelen
 		return "", fmt.Errorf("%w: not found", ErrInvalidSubject)
 	}
 

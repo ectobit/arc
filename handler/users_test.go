@@ -89,7 +89,7 @@ var _ repository.Users = (*usersRepositoryFake)(nil)
 type usersRepositoryFake struct{}
 
 func (repo *usersRepositoryFake) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
-	return &domain.User{}, nil
+	return &domain.User{}, nil //nolint:exhaustivestruct
 }
 
 func (repo *usersRepositoryFake) FetchByEmail(ctx context.Context, email string) (*domain.User, error) {
