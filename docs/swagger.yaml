@@ -9,6 +9,13 @@ definitions:
       password:
         type: string
     type: object
+  public.ResetPassword:
+    properties:
+      password:
+        type: string
+      passwordResetToken:
+        type: string
+    type: object
   public.User:
     properties:
       authToken:
@@ -172,6 +179,36 @@ paths:
       tags:
       - users
   /users/reset-password:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Password reset token and new password
+        in: body
+        name: resetPassword
+        required: true
+        schema:
+          $ref: '#/definitions/public.ResetPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/public.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/render.Error'
+        "500":
+          description: ""
+      summary: Set new user's password.
+      tags:
+      - users
     post:
       consumes:
       - application/json
