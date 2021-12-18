@@ -44,8 +44,8 @@ func SubjectFromJWT(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("claims from jwt: %w", err)
 	}
 
-	sub, ok := claims["sub"]
-	if !ok { //nolint:varnamelen
+	sub, ok := claims["sub"] //nolint:varnamelen
+	if !ok {
 		return "", fmt.Errorf("%w: not found", ErrInvalidSubject)
 	}
 
