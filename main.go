@@ -79,7 +79,7 @@ func main() { //nolint:funlen
 	mux := chi.NewRouter()
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.Heartbeat("/health"))
-	mux.Use(mw.LaxLogger(log))
+	mux.Use(lax.Middleware(log))
 	mux.Use(middleware.Recoverer)
 	mux.Use(hsts(cfg.Development, cfg.ExternalURL.URL).Handler)
 
