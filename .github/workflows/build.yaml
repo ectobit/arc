@@ -103,7 +103,7 @@ jobs:
           username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
       - name: Build and push image to container registry
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v2.8.0
         with:
           build-args: LD_FLAGS=${{ steps.flags.outputs.flags }}
           platforms: linux/amd64,linux/arm64
