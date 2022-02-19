@@ -17,7 +17,7 @@ require (
 	github.com/swaggo/swag v1.7.9
 	github.com/unrolled/secure v1.10.0
 	go.ectobit.com/act v0.2.3
-	go.ectobit.com/lax v0.0.0-20220219091834-a31442c705c6
+	go.ectobit.com/lax v0.1.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 )

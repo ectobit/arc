@@ -207,8 +207,8 @@ github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.ectobit.com/act v0.2.3 h1:+68D0CONeQOHyF1FQDHtdisQ6xTxxeGGDQvzBUXyEto=
 go.ectobit.com/act v0.2.3/go.mod h1:SF98qeQrDXldXyTUZjkpTqx5uoOpAskIK5Zdnjwev/4=
-go.ectobit.com/lax v0.0.0-20220219091834-a31442c705c6 h1:mgifKDiUtNvrAkEtqduP1BbssEJSpc6sKXnjDuKnzBY=
-go.ectobit.com/lax v0.0.0-20220219091834-a31442c705c6/go.mod h1:XWazpGWIVAZKc8jxs2hh0KTYcf1YZrjXbhpX6KEIJME=
+go.ectobit.com/lax v0.1.0 h1:1MA7fxtbjUbuD3l/g635fkM9qvgNqNkXew7ikLW2dxU=
+go.ectobit.com/lax v0.1.0/go.mod h1:XWazpGWIVAZKc8jxs2hh0KTYcf1YZrjXbhpX6KEIJME=
 go.uber.org/atomic v1.3.2/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.5.0/go.mod h1:sABNBOSYdrvTF6hTgEIbc7YasKWGhgEQZyfxyTvoXHQ=
