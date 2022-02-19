@@ -15,25 +15,25 @@ type UserLogin struct {
 
 // UserLoginFromJSON parses user login data from request body.
 func UserLoginFromJSON(body io.Reader, log lax.Logger) (*UserLogin, error) {
-	var u UserLogin
+	var userLogin UserLogin
 
-	if err := json.NewDecoder(body).Decode(&u); err != nil {
+	if err := json.NewDecoder(body).Decode(&userLogin); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
 		return nil, NewBadRequestError("invalid json body")
 	}
 
-	if u.Email == "" {
+	if userLogin.Email == "" {
 		return nil, NewBadRequestError("empty email")
 	}
 
-	if !isValidEmail(u.Email) {
+	if !isValidEmail(userLogin.Email) {
 		return nil, NewBadRequestError("invalid email")
 	}
 
-	if u.Password == "" {
+	if userLogin.Password == "" {
 		return nil, NewBadRequestError("empty password")
 	}
 
-	return &u, nil
+	return &userLogin, nil
 }

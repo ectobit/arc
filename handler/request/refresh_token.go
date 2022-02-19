@@ -14,17 +14,17 @@ type RefreshToken struct {
 
 // RefreshTokenFromBody parses RefreshToken from request body.
 func RefreshTokenFromBody(body io.Reader, log lax.Logger) (*RefreshToken, error) {
-	var rt RefreshToken
+	var refreshToken RefreshToken
 
-	if err := json.NewDecoder(body).Decode(&rt); err != nil {
+	if err := json.NewDecoder(body).Decode(&refreshToken); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
 		return nil, NewBadRequestError("invalid json body")
 	}
 
-	if rt.RefreshToken == "" {
+	if refreshToken.RefreshToken == "" {
 		return nil, NewBadRequestError("empty refresh token")
 	}
 
-	return &rt, nil
+	return &refreshToken, nil
 }

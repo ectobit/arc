@@ -17,34 +17,34 @@ type ResetPassword struct {
 
 // ResetPasswordFromJSON parses ResetPassword from request body.
 func ResetPasswordFromJSON(body io.Reader, log lax.Logger) (*ResetPassword, error) {
-	var rp ResetPassword
+	var resetPassword ResetPassword
 
 	var err error
 
-	if err := json.NewDecoder(body).Decode(&rp); err != nil {
+	if err := json.NewDecoder(body).Decode(&resetPassword); err != nil {
 		log.Warn("decode json: %w", lax.Error(err))
 
 		return nil, NewBadRequestError("invalid json body")
 	}
 
-	if rp.PasswordResetToken == "" {
+	if resetPassword.PasswordResetToken == "" {
 		return nil, NewBadRequestError("empty password reset token")
 	}
 
-	if rp.Password == "" {
+	if resetPassword.Password == "" {
 		return nil, NewBadRequestError("empty password")
 	}
 
-	if isWeakPassword(rp.Password) {
+	if isWeakPassword(resetPassword.Password) {
 		return nil, NewBadRequestError("weak password")
 	}
 
-	rp.HashedPassword, err = domain.HashPassword(rp.Password)
+	resetPassword.HashedPassword, err = domain.HashPassword(resetPassword.Password)
 	if err != nil {
 		log.Warn("hash password", lax.Error(err))
 
 		return nil, NewInternalServerError()
 	}
 
-	return &rp, nil
+	return &resetPassword, nil
 }
