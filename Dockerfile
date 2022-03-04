@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3
-FROM golang:1.17.7-alpine AS builder
+FROM golang:1.18rc1-alpine AS builder
 
 ARG LD_FLAGS='-s -w -extldflags "-static"'
 
