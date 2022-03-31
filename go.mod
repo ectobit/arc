@@ -14,7 +14,7 @@ require (
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
 	github.com/swaggo/http-swagger v1.2.5
-	github.com/swaggo/swag v1.8.0
+	github.com/swaggo/swag v1.8.1
 	github.com/unrolled/secure v1.10.0
 	go.ectobit.com/act v0.2.3
 	go.ectobit.com/lax v0.1.0
