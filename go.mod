@@ -19,7 +19,7 @@ require (
 	go.ectobit.com/act v0.2.3
 	go.ectobit.com/lax v0.1.0
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
 )
 
 require (
