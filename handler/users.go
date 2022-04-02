@@ -28,7 +28,8 @@ type UsersHandler struct {
 
 // NewUsersHandler creates users handler.
 func NewUsersHandler(ur repository.Users, jwt *token.JWT, sender send.Sender, externalURL string,
-	frontendPasswordResetPath string, log lax.Logger) *UsersHandler {
+	frontendPasswordResetPath string, log lax.Logger,
+) *UsersHandler {
 	return &UsersHandler{
 		usersRepo:                 ur,
 		jwt:                       jwt,

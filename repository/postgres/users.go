@@ -131,7 +131,8 @@ WHERE email=$1 AND active=TRUE RETURNING id, email, password_reset_token`
 
 // ResetPassword sets new user's password in PostgreSQL database.
 func (repo *UsersRepository) ResetPassword(ctx context.Context, passwordResetToken string,
-	password []byte) (*domain.User, error) {
+	password []byte,
+) (*domain.User, error) {
 	query := `UPDATE users SET password=$1, password_reset_token=NULL
 WHERE password_reset_token=$2 AND active=TRUE RETURNING id, email`
 

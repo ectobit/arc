@@ -108,6 +108,7 @@ func (repo *usersRepositoryFake) FetchPasswordResetToken(ctx context.Context, em
 }
 
 func (repo *usersRepositoryFake) ResetPassword(ctx context.Context, passwordResetToken string,
-	password []byte) (*domain.User, error) {
+	password []byte,
+) (*domain.User, error) {
 	panic("unimplemented")
 }
