@@ -103,11 +103,11 @@ func (repo *usersRepositoryFake) Activate(ctx context.Context, token string) (*d
 	panic("unimplemented")
 }
 
-func (repo *usersRepositoryFake) FetchPasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
+func (repo *usersRepositoryFake) FetchRecoveryToken(ctx context.Context, email string) (*domain.User, error) {
 	panic("unimplemented")
 }
 
-func (repo *usersRepositoryFake) ResetPassword(ctx context.Context, passwordResetToken string,
+func (repo *usersRepositoryFake) ResetPassword(ctx context.Context, recoveryToken string,
 	password []byte,
 ) (*domain.User, error) {
 	panic("unimplemented")

@@ -22,12 +22,12 @@ func TestResetPasswordFromJSON(t *testing.T) {
 	}{
 		"invalid json body": {``, nil, "invalid json body"},
 		"empty body":        {`{}`, nil, "empty password reset token"},
-		"all empty":         {`{"passwordResetToken":"","password":""}`, nil, "empty password reset token"},
-		"empty password":    {`{"passwordResetToken":"test","password":""}`, nil, "empty password"},
-		"weak password":     {`{"passwordResetToken":"test","password":"pass"}`, nil, "weak password"},
+		"all empty":         {`{"recoveryToken":"","password":""}`, nil, "empty password reset token"},
+		"empty password":    {`{"recoveryToken":"test","password":""}`, nil, "empty password"},
+		"weak password":     {`{"recoveryToken":"test","password":"pass"}`, nil, "weak password"},
 		"ok": {
-			`{"passwordResetToken":"test","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
-			&request.ResetPassword{PasswordResetToken: "test", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustivestruct,lll
+			`{"recoveryToken":"test","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
+			&request.ResetPassword{RecoveryToken: "test", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustivestruct,lll
 		},
 	}
 
@@ -52,7 +52,7 @@ func TestResetPasswordFromJSON(t *testing.T) {
 				return
 			}
 
-			if got.PasswordResetToken != test.want.PasswordResetToken || got.Password != test.want.Password {
+			if got.RecoveryToken != test.want.RecoveryToken || got.Password != test.want.Password {
 				t.Errorf("ResetPasswordFromJSON(%q) = %v; want %v", test.in, got, test.want)
 			}
 

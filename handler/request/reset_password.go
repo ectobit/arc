@@ -10,9 +10,9 @@ import (
 
 // ResetPassword contains user's password reset token and new password to be set.
 type ResetPassword struct {
-	PasswordResetToken string `json:"passwordResetToken"`
-	Password           string `json:"password"`
-	HashedPassword     []byte `json:"-"`
+	RecoveryToken  string `json:"recoveryToken"`
+	Password       string `json:"password"`
+	HashedPassword []byte `json:"-"`
 }
 
 // ResetPasswordFromJSON parses ResetPassword from request body.
@@ -27,7 +27,7 @@ func ResetPasswordFromJSON(body io.Reader, log lax.Logger) (*ResetPassword, erro
 		return nil, NewBadRequestError("invalid json body")
 	}
 
-	if resetPassword.PasswordResetToken == "" {
+	if resetPassword.RecoveryToken == "" {
 		return nil, NewBadRequestError("empty password reset token")
 	}
 

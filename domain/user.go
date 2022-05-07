@@ -9,15 +9,15 @@ import (
 
 // User contains user data.
 type User struct {
-	ID                 string
-	Email              string
-	Password           []byte
-	ActivationToken    string
-	PasswordResetToken string
-	Activated          *time.Time
-	Created            *time.Time
-	Updated            *time.Time
-	Active             *bool
+	ID              string
+	Email           string
+	Password        []byte
+	ActivationToken string
+	RecoveryToken   string
+	Activated       *time.Time
+	Created         *time.Time
+	Updated         *time.Time
+	Active          *bool
 }
 
 // IsActive checks if user account is activated.

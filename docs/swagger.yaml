@@ -13,7 +13,7 @@ definitions:
     properties:
       password:
         type: string
-      passwordResetToken:
+      recoveryToken:
         type: string
     type: object
   request.UserLogin:

@@ -5,7 +5,7 @@ CREATE TABLE users (
   email character varying(254) UNIQUE NOT NULL CHECK (email != ''),
   password bytea NOT NULL CHECK (password != ''),
   activation_token uuid DEFAULT gen_random_uuid(),
-  password_reset_token uuid,
+  recovery_token uuid,
   active boolean DEFAULT FALSE NOT NULL,
   activated timestamp with time zone
   created timestamp with time zone DEFAULT current_timestamp NOT NULL,

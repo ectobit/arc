@@ -210,7 +210,7 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 		return
 	}
 
-	user, err := h.usersRepo.FetchPasswordResetToken(req.Context(), email.Email)
+	user, err := h.usersRepo.FetchRecoveryToken(req.Context(), email.Email)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {
 			response.RenderErrorStatus(res, http.StatusNotFound, err.Error(), h.log)
@@ -224,7 +224,7 @@ func (h *UsersHandler) RequestPasswordReset(res http.ResponseWriter, req *http.R
 		return
 	}
 
-	message := fmt.Sprintf("%s/%s/%s", h.externalURL, h.frontendPasswordResetPath, user.PasswordResetToken)
+	message := fmt.Sprintf("%s/%s/%s", h.externalURL, h.frontendPasswordResetPath, user.RecoveryToken)
 
 	if err = h.sender.Send(user.Email, "Password reset request", message); err != nil {
 		h.log.Warn("send password reset token", lax.Error(err))
@@ -280,7 +280,7 @@ func (h *UsersHandler) ResetPassword(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	domainUser, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.PasswordResetToken,
+	domainUser, err := h.usersRepo.ResetPassword(req.Context(), resetPassword.RecoveryToken,
 		resetPassword.HashedPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrResourceNotFound) {

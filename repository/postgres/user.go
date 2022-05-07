@@ -9,15 +9,15 @@ import (
 
 // User entity.
 type User struct {
-	ID                 string
-	Email              string
-	Password           pgtype.Bytea
-	ActivationToken    pgtype.UUID
-	PasswordResetToken pgtype.UUID
-	Activated          pgtype.Timestamptz
-	Created            pgtype.Timestamptz
-	Updated            pgtype.Timestamptz
-	Active             bool
+	ID              string
+	Email           string
+	Password        pgtype.Bytea
+	ActivationToken pgtype.UUID
+	RecoveryToken   pgtype.UUID
+	Activated       pgtype.Timestamptz
+	Created         pgtype.Timestamptz
+	Updated         pgtype.Timestamptz
+	Active          bool
 }
 
 // DomainUser converts user entity to domain user.
@@ -50,8 +50,8 @@ func (u *User) DomainUser() (*domain.User, error) {
 		}
 	}
 
-	if u.PasswordResetToken.Status == pgtype.Present {
-		if err := u.PasswordResetToken.AssignTo(&domainUser.PasswordResetToken); err != nil {
+	if u.RecoveryToken.Status == pgtype.Present {
+		if err := u.RecoveryToken.AssignTo(&domainUser.RecoveryToken); err != nil {
 			return nil, fmt.Errorf("assign password reset token: %w", err)
 		}
 	}

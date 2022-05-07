@@ -32,7 +32,7 @@ PATCH http://localhost:3000/users/reset-password HTTP/1.1
 content-type: application/json
 
 {
-    "passwordResetToken": "926c7bed-18a7-4c0f-97fd-f5901b2c52ba",
+    "recoveryToken": "926c7bed-18a7-4c0f-97fd-f5901b2c52ba",
     "password": "h+z67{GxLSL~]Cl(I88AqV7w"
 }
 

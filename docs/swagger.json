@@ -309,7 +309,7 @@
                 "password": {
                     "type": "string"
                 },
-                "passwordResetToken": {
+                "recoveryToken": {
                     "type": "string"
                 }
             }
