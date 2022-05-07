@@ -87,9 +87,46 @@ FROM users WHERE email=$1`
 	return domainUser, nil
 }
 
+// FindAll fetches alls users from PostgreSQL.
+func (repo *UsersRepository) FindAll(ctx context.Context) ([]domain.User, error) {
+	query := `SELECT id, email, password, activation_token, password_reset_token, activated, active, created, updated
+FROM users`
+
+	rows, err := repo.pool.Query(ctx, repository.StripWhitespaces(query))
+	if err != nil {
+		return nil, repositoryError("fetch all users", err)
+	}
+
+	defer rows.Close()
+
+	domainUsers := []domain.User{}
+
+	for rows.Next() {
+		var user User
+
+		if err := rows.Scan(&user.ID, &user.Email, &user.Password, &user.ActivationToken, &user.PasswordResetToken,
+			&user.Activated, &user.Active, &user.Created, &user.Updated); err != nil {
+			return nil, repositoryError("scan", err)
+		}
+
+		domainUser, err := user.DomainUser()
+		if err != nil {
+			return nil, fmt.Errorf("convert to domain user: %w", err)
+		}
+
+		domainUsers = append(domainUsers, *domainUser)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, repositoryError("rows err", err)
+	}
+
+	return domainUsers, nil
+}
+
 // Activate activates user account in PostgreSQL database.
 func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domain.User, error) {
-	query := `UPDATE users SET updated=now(), activation_token=NULL, active=TRUE
+	query := `UPDATE users SET updated=now(), activation_token=NULL, activated=current_timestamp, active=TRUE
 		WHERE activation_token=$1 RETURNING id, email, password, created, updated`
 
 	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), token)
@@ -111,7 +148,7 @@ func (repo *UsersRepository) Activate(ctx context.Context, token string) (*domai
 // FetchPasswordResetToken sets user's password reset token in PostgreSQL repository.
 func (repo *UsersRepository) FetchPasswordResetToken(ctx context.Context, email string) (*domain.User, error) {
 	query := `UPDATE users SET password_reset_token=gen_random_uuid()
-WHERE email=$1 AND active=TRUE RETURNING id, email, password_reset_token`
+WHERE email=$1 AND active RETURNING id, email, password_reset_token`
 
 	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), email)
 
@@ -134,7 +171,7 @@ func (repo *UsersRepository) ResetPassword(ctx context.Context, passwordResetTok
 	password []byte,
 ) (*domain.User, error) {
 	query := `UPDATE users SET password=$1, password_reset_token=NULL
-WHERE password_reset_token=$2 AND active=TRUE RETURNING id, email`
+WHERE password_reset_token=$2 AND active RETURNING id, email`
 
 	row := repo.pool.QueryRow(ctx, repository.StripWhitespaces(query), password, passwordResetToken)
 

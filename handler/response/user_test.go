@@ -19,6 +19,7 @@ func TestFromDomainUser(t *testing.T) {
 		ID:                 "926c7bed-18a7-4c0f-97fd-f5901b2c52ba",
 		Email:              "john.doe@sixpack.com",
 		Password:           []byte{},
+		Activated:          nil,
 		Created:            &now,
 		Updated:            &now,
 		ActivationToken:    "",

@@ -12,10 +12,11 @@ type User struct {
 	ID                 string
 	Email              string
 	Password           pgtype.Bytea
-	Created            pgtype.Timestamptz
-	Updated            pgtype.Timestamptz
 	ActivationToken    pgtype.UUID
 	PasswordResetToken pgtype.UUID
+	Activated          pgtype.Timestamptz
+	Created            pgtype.Timestamptz
+	Updated            pgtype.Timestamptz
 	Active             bool
 }
 
@@ -29,6 +30,10 @@ func (u *User) DomainUser() (*domain.User, error) {
 
 	if u.Password.Status == pgtype.Present {
 		domainUser.Password = u.Password.Bytes
+	}
+
+	if u.Activated.Status == pgtype.Present {
+		domainUser.Activated = &u.Activated.Time
 	}
 
 	if u.Created.Status == pgtype.Present {

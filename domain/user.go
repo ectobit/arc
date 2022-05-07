@@ -12,10 +12,11 @@ type User struct {
 	ID                 string
 	Email              string
 	Password           []byte
-	Created            *time.Time
-	Updated            *time.Time
 	ActivationToken    string
 	PasswordResetToken string
+	Activated          *time.Time
+	Created            *time.Time
+	Updated            *time.Time
 	Active             *bool
 }
 
