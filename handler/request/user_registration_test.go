@@ -28,7 +28,7 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 		"weak password":     {`{"email":"john.doe@sixpack.com","password":"pass"}`, nil, "weak password"},
 		"ok": {
 			`{"email":"john.doe@sixpack.com","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
-			&request.UserRegistration{Email: "john.doe@sixpack.com", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustivestruct,lll
+			&request.UserRegistration{Email: "john.doe@sixpack.com", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustruct,lll
 		},
 	}
 
@@ -57,7 +57,7 @@ func TestUserRegistrationFromJSON(t *testing.T) {
 				t.Errorf("UserRegistrationFromJSON(%q) = %v; want %v", test.in, got, test.want)
 			}
 
-			domainUser := &domain.User{ //nolint:exhaustivestruct
+			domainUser := &domain.User{ //nolint:exhaustruct
 				Email:    got.Email,
 				Password: got.HashedPassword,
 			}

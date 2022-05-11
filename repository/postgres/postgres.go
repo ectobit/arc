@@ -42,7 +42,7 @@ func repositoryError(description string, err error) error {
 		return repository.ErrResourceNotFound
 	}
 
-	pgErr := &pgconn.PgError{} //nolint:exhaustivestruct
+	pgErr := &pgconn.PgError{} //nolint:exhaustruct
 
 	if errors.As(err, &pgErr) {
 		switch pgErr.Code { //nolint:gocritic

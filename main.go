@@ -61,7 +61,7 @@ func main() { //nolint:funlen
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
-	cfg := &config{} //nolint:exhaustivestruct
+	cfg := &config{} //nolint:exhaustruct
 
 	cli := act.New("arc")
 
@@ -114,7 +114,7 @@ func main() { //nolint:funlen
 		r.Use(mw.Authorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv"), log))
 	})
 
-	server := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: mux} //nolint:exhaustivestruct
+	server := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: mux} //nolint:exhaustruct
 
 	go func() {
 		log.Info("listening", lax.Uint("port", cfg.Port), lax.String("version", version),
@@ -150,7 +150,7 @@ func mustCreateLogger(logFormat, logLevel string) *lax.ZapAdapter {
 }
 
 func hsts(development bool, externalURL *url.URL) *secure.Secure {
-	return secure.New(secure.Options{ //nolint:exhaustivestruct
+	return secure.New(secure.Options{ //nolint:exhaustruct
 		IsDevelopment:      development,
 		AllowedHosts:       []string{externalURL.Host},
 		HostsProxyHeaders:  []string{"X-Forwarded-Host"},

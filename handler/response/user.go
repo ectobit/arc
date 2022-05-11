@@ -18,7 +18,7 @@ type User struct {
 
 // FromDomainUser converts domain user to public user.
 func FromDomainUser(user *domain.User) *User {
-	return &User{ //nolint:exhaustivestruct
+	return &User{ //nolint:exhaustruct
 		ID:      user.ID,
 		Email:   user.Email,
 		Created: user.Created,

@@ -12,17 +12,17 @@ type User struct {
 	ID              string
 	Email           string
 	Password        pgtype.Bytea
-	ActivationToken pgtype.UUID
-	RecoveryToken   pgtype.UUID
 	Activated       pgtype.Timestamptz
 	Created         pgtype.Timestamptz
 	Updated         pgtype.Timestamptz
+	ActivationToken pgtype.UUID
+	RecoveryToken   pgtype.UUID
 	Active          bool
 }
 
 // DomainUser converts user entity to domain user.
 func (u *User) DomainUser() (*domain.User, error) {
-	domainUser := &domain.User{ //nolint:exhaustivestruct
+	domainUser := &domain.User{ //nolint:exhaustruct
 		ID:     u.ID,
 		Email:  u.Email,
 		Active: &u.Active,

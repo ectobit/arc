@@ -17,7 +17,7 @@ type Error struct {
 
 // RenderError renders response with error by provided error.
 func RenderError(res http.ResponseWriter, err error, log lax.Logger) {
-	reqErr := &request.Error{} //nolint:exhaustivestruct
+	reqErr := &request.Error{} //nolint:exhaustruct
 
 	if errors.As(err, &reqErr) {
 		Render(res, reqErr.StatusCode, &Error{Error: reqErr.Error()}, log)

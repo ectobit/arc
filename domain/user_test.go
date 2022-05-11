@@ -14,7 +14,7 @@ func TestIsValidPassword(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	user := domain.User{ //nolint:exhaustivestruct
+	user := domain.User{ //nolint:exhaustruct
 		Password: password,
 	}
 

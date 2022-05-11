@@ -27,7 +27,7 @@ func TestResetPasswordFromJSON(t *testing.T) {
 		"weak password":     {`{"recoveryToken":"test","password":"pass"}`, nil, "weak password"},
 		"ok": {
 			`{"recoveryToken":"test","password":"h+z67{GxLSL~]Cl(I88AqV7w"}`,
-			&request.ResetPassword{RecoveryToken: "test", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustivestruct,lll
+			&request.ResetPassword{RecoveryToken: "test", Password: "h+z67{GxLSL~]Cl(I88AqV7w"}, "", //nolint:exhaustruct
 		},
 	}
 
@@ -56,7 +56,7 @@ func TestResetPasswordFromJSON(t *testing.T) {
 				t.Errorf("ResetPasswordFromJSON(%q) = %v; want %v", test.in, got, test.want)
 			}
 
-			domainUser := &domain.User{ //nolint:exhaustivestruct
+			domainUser := &domain.User{ //nolint:exhaustruct
 				Password: got.HashedPassword,
 			}
 

@@ -38,7 +38,7 @@ func NewJWT(issuer, secret string, authTokenExp, refreshTokenExp time.Duration) 
 }
 
 // Tokens generates auth and refresh jwt tokens.
-func (j *JWT) Tokens(userID, requestID string) (authToken, refreshToken string, err error) {
+func (j *JWT) Tokens(userID, requestID string) (authToken, refreshToken string, err error) { //nolint:nonamedreturns
 	now := time.Now()
 
 	if _, authToken, err = j.jwtauth.Encode(jwt.MapClaims{

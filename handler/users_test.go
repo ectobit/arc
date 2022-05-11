@@ -88,7 +88,7 @@ var _ repository.Users = (*usersRepositoryFake)(nil)
 type usersRepositoryFake struct{}
 
 func (repo *usersRepositoryFake) Create(ctx context.Context, email string, password []byte) (*domain.User, error) {
-	return &domain.User{}, nil //nolint:exhaustivestruct
+	return &domain.User{}, nil //nolint:exhaustruct
 }
 
 func (repo *usersRepositoryFake) FindOne(ctx context.Context, id string) (*domain.User, error) {
