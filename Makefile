@@ -4,9 +4,7 @@ gen-swagger:
 	@swag init
 
 lint:
-	@golangci-lint run --exclude-use-default=false --enable-all \
-		--disable exhaustivestruct \
-		--disable execinquery
+	@golangci-lint run
 
 start:
 	@docker-compose up --build
