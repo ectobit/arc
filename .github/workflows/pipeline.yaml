@@ -31,7 +31,7 @@ jobs:
     needs: flags
     with:
       image: ectobit/arc
-      hadolint-ignore: DL3006
+      hadolint-ignore: DL3018
       build-args: LD_FLAGS=${{ needs.flags.outputs.flags }}
     secrets:
       container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
