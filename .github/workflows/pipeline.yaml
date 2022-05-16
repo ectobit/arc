@@ -12,8 +12,6 @@ jobs:
   flags:
     uses: ectobit/reusable-workflows/.github/workflows/go-ld-flags.yaml@main
     needs: check
-    outputs:
-      flags: ${{ steps.flags.outputs.flags }}
   build:
     uses: ectobit/reusable-workflows/.github/workflows/buildx.yaml@main
     needs: flags
