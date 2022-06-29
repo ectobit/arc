@@ -6,7 +6,7 @@ require (
 	github.com/casbin/casbin v1.9.1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/jwtauth/v5 v5.0.2
-	github.com/golang-jwt/jwt/v4 v4.4.1
+	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/google/go-cmp v0.5.8
 	github.com/jackc/pgconn v1.12.1
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
@@ -14,12 +14,12 @@ require (
 	github.com/jackc/pgx/v4 v4.16.1
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
 	github.com/swaggo/http-swagger v1.3.0
-	github.com/swaggo/swag v1.8.2
+	github.com/swaggo/swag v1.8.3
 	github.com/unrolled/secure v1.10.0
 	go.ectobit.com/act v0.2.3
 	go.ectobit.com/lax v0.1.0
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )
 
 require (
@@ -54,8 +54,8 @@ require (
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
-	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
+	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
