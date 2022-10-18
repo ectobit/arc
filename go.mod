@@ -14,7 +14,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354
 	github.com/swaggo/http-swagger v1.3.3
-	github.com/swaggo/swag v1.8.6
+	github.com/swaggo/swag v1.8.7
 	github.com/unrolled/secure v1.13.0
 	go.ectobit.com/act v0.2.3
 	go.ectobit.com/lax v0.1.0
@@ -55,9 +55,9 @@ require (
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
-	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/net v0.0.0-20221017152216-f25eb7ecb193 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
